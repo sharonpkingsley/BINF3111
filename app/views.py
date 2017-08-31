@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, url_for
 from app import app
 from .forms import SearchForm
 
@@ -10,11 +10,11 @@ def index():
     if form.validate_on_submit():
         flash('Search requested for keyword="%s"' %
               (form.keyword.data))
-        return redirect('/result')
+        return redirect(url_for('result', keyword=form.keyword.data))
     return render_template('index.html',
                            title='Search',
                            form=form)
 
-@app.route('/result')
-def result():
-  return render_template('result.html', title='Result')
+@app.route('/result/<keyword>', methods=['GET','POST'])
+def result(keyword):
+  return render_template('result.html', title='Result', keyword=keyword)
