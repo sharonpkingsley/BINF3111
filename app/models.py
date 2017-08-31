@@ -1,7 +1,7 @@
 from app import db
 
 
-class User(db.Model):
+class Keyword(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     drug_a = db.Column(db.String(64), index=True)
     drug_b = db.Column(db.String(64), index=True)
@@ -9,5 +9,5 @@ class User(db.Model):
     value = db.Column(db.Float(16), index=True)
 
     def __repr__(self):
-        return '<User %r>' % (self.drug_a)
+        return '<Keyword %r>' % (self.drug_a)
 

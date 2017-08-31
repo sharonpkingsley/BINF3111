@@ -1,0 +1,16 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <script type="text/javascript">
+    function get_keyword(keyword)
+    {
+        form = document.forms['search'];
+        keyword = form.elements['keyword'].value;
+    }
+    </script>
+    <h1>Result</h1>
+        <p>
+        	{{ keyword }}    
+        </p>
+{% endblock %}
