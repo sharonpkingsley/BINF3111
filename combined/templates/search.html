@@ -1,0 +1,35 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+    <script type="text/javascript">
+    function set_keyword(query, evidence)
+    {
+        form = document.forms['search'];
+        form.elements['query'].value = query;
+        form.elements['evidence'].value = evidence;
+    }
+    </script>
+    <h1>Search</h1>
+    <form action="" method="post" name="search">
+        {{ form.hidden_tag() }}
+        <p>
+            Please enter your keyword below:<br>
+            {{ form.query(size=80) }}
+            {% for error in form.query.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            <!--|{% for pr in providers %}-->
+            <!--    <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">{{ pr.name }}</a> |
+            {% endfor %}-->
+        </p>
+        <p> 
+            Please select your evidence type below:<br>
+            {{ form.evidence(size=80) }}
+            {% for error in form.query.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+        <p>{{ form.evi1 }} evi1 {{ form.evi2 }} evi2</p>
+        <p><input type="submit" value="Search"></p>
+    </form>
+{% endblock %}
