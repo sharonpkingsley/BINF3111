@@ -1,5 +1,4 @@
 <html>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
   <head>
     {% if title %}
     <title>{{ title }} - DrugSim</title>
@@ -8,7 +7,7 @@
     {% endif %}
   </head>
   <body>
-    <div>DrugSim: <a href="/">Home</a></div>
+    <div>DrugSim: <a href="/index">Home</a></div>
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}
