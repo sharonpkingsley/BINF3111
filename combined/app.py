@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 #mysql setup
 mysql = MySQL()
 app = Flask(__name__)
+app._static_folder = "/static"
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
@@ -27,6 +28,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # form validate configs
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'you-will-never-guess'
+
+
+@app.route('/cytoscape1.js')
+def script():
+    return render_template('cytoscape1.js')
 
 # file format check ########TO DO#######
 def allowed_file(filename):
