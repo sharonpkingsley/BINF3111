@@ -40,3 +40,21 @@ end $$
 DELIMITER ;
 
 
+
+select 
+  evib.`Unnamed: 0`,
+  evia.`ANWABDrug` as eviaa, 
+  evib.`ANWABDrug` as evibb
+from evia, evib
+where evia.`Unnamed: 0` = evib.`Unnamed: 0`
+union
+select evib.`Unnamed: 0`, '0' as eviaa, evib.`ANWABDrug` as evibb 
+from evib
+where evib.`Unnamed: 0` NOT IN
+    (select `Unnamed: 0` from evia)
+union
+select evia.`Unnamed: 0`, 'ANWABDrug' as eviaa, '0' as evibb 
+from evia
+where evia.`Unnamed: 0` NOT IN
+    (select `Unnamed: 0` from evib)
+

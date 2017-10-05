@@ -4,9 +4,13 @@ from forms import SearchForm
 from werkzeug import secure_filename #generate_password_hash, check_password_hash, 
 import os
 import sys
+import re
 import pandas as pd
+import StringIO, csv 
 from sqlalchemy import create_engine
-  
+
+from flask import send_file
+from flask import make_response  
 #mysql setup
 mysql = MySQL()
 app = Flask(__name__)
@@ -39,7 +43,7 @@ def upload_file():
     if request.method == 'POST':
         try:
                 file = request.files['file']
-                evidence_name = request.form['evidence']
+                evidence_name = request.form['option']
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     saveLocation = app.config['UPLOAD_FOLDER'] + filename
@@ -55,7 +59,7 @@ def upload_file():
         except Exception as e:
             return render_template('error.html', error = 'No file selected or no evidence entered!')
     else:
-        return render_template('upload.html')
+        return render_template('upload.html', evidence_list = ['evia', 'evib'])
 
 # main page
 @app.route('/', methods=['GET', 'POST'])
@@ -68,8 +72,17 @@ def search():
     if request.method == 'POST':
        try:
                 _query = request.form['query']
-                _evidence = request.form['evidence']
-                return redirect(url_for('result', query=_query, evidence = _evidence))
+                #get list
+                evi_list = ['evia', 'evib']
+                chosen_evis = []
+                for evi in evi_list:
+                    try:
+                        if request.form[str(evi)] == 'y':
+                            chosen_evis.append(evi)
+                    except Exception as e:
+                        print 'skip' + evi
+                #print chosen_evis
+                return redirect(url_for('result', query=_query, evidence = chosen_evis))
        except Exception as e:
                 return render_template('error.html', error= 'Drug or evidence name is missing.')
        
@@ -88,34 +101,131 @@ def search():
 # result page
 @app.route('/result/<query>/<evidence>', methods=['GET','POST'])
 def result(query,evidence):
-  # parse data 
-    #print data
-    conn = mysql.connect()
-    cursor = conn.cursor()
-    args = (query, evidence)
-    cursor.callproc('searchOneEvidence', args)
-    data = cursor.fetchall()
-    conn.close()
-
-    print data
-    print type(data)
-    datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
-    datadf.set_index(['Name'],inplace = True)
-    datadf.index.name = None
-    print datadf
-    data_table = datadf.to_html()
-    titles = ['na']
-    titles.append('Drugs with evidence '+ evidence)
-
-    if len(data) >0:
-    # no url change now
-        return render_template('result.html',tables=[datadf.to_html(classes='male')], titles = titles)
-    else:
-        return render_template('error.html', error = 'No result!')
+    # format unicode into string - correct format to input into database
+    formatted_evidence = str(evidence).replace("[",'')
+    formatted_evidence = formatted_evidence.replace(']','')
+    formatted_evidence = formatted_evidence.replace("'",'')
+    formatted_evidence = formatted_evidence.replace(" ",'')
+    print formatted_evidence
+    evidences = formatted_evidence.split(",")
+        
+    if request.method == 'GET':
+        # DATA RETRIEVATION
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        datadf_htmls = []
+        titles = ['na']
+        for evi in evidences:
+            print evi
+            args = (query, evi)
+            cursor.callproc('searchOneEvidence', args)
     
-#@app.route('/showSignUp')
-#def showSignUp():
-#    return render_template('signup.html')
+            data = cursor.fetchall()
+            datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
+            datadf.set_index(['Name'],inplace = True)
+            datadf.index.name = None
+            print datadf
+            data_table = datadf.to_html()
+            titles.append('Drugs with evidence '+ evi)
+            datadf_htmls.append(datadf.to_html(classes='male'))
+            print titles
+    
+        conn.close()
+        #print data
+        #print type(data)
+        #datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
+        #datadf.set_index(['Name'],inplace = True)
+        #datadf.index.name = None
+        #print datadf
+        #data_table = datadf.to_html()
+        #titles = ['na']
+        #titles.append('Drugs with evidence '+ evidence)
+
+        if len(data) >0:
+        # no url change now
+            return render_template('result.html',tables=datadf_htmls, titles = titles)
+        else:
+            return render_template('error.html', error = 'No result!')
+    elif request.method == 'POST':
+        if request.form['submit'] == 'Get Data':
+            #query = request.form['drug']
+            #evidence_input_name = get_evis()
+            #print drug_input_name
+            #print evidence_input_name
+            print evidences
+            print query
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            si = StringIO.StringIO()
+            cw = csv.writer(si)
+            for evi in evidences:
+                print evi
+                args = (query, evi)
+                cursor.callproc('searchOneEvidence', args)
+                data = cursor.fetchall()
+
+                cw.writerow([i[0] for i in cursor.description])
+                cw.writerows(data)
+                response = make_response(si.getvalue())
+                response.headers['Content-Disposition'] = 'attachment; filename=report.csv'
+                response.headers["Content-type"] = "text/csv"
+            conn.close()
+            return response
+        
+
+@app.route('/cytoscape1.js')
+def script():
+    return render_template('cytoscape1.js')    
+
+NAMES=["abc","abcd","abcde","abcdef"]
+
+@app.route('/autocomplete',methods=['GET'])
+def autocomplete():
+    search = request.args.get('query')
+
+    app.logger.debug(search)
+    return jsonify(json_list=NAMES) 
+
+# get evidence list
+def get_evis():
+    evi_list = ['evia', 'evib']
+    chosen_evis = []
+    for evi in evi_list:
+            try:
+                if request.form[str(evi)] == 'y':
+                    chosen_evis.append(evi)
+            except Exception as e:
+                print 'skip' + evi
+    return chosen_evis
+
+
+#export the data
+@app.route('/export', methods=['GET','POST'])   
+def export():
+    if request.method == 'POST':
+        if request.form['submit'] == 'Get Data':
+            drug_input_name = request.form['drug']
+            evidence_input_name = get_evis()
+            print drug_input_name
+            print evidence_input_name
+
+            conn = mysql.connect()
+            cursor = conn.cursor()
+            si = StringIO.StringIO()
+            cw = csv.writer(si)
+
+            args = (drug_input_name, evidence_input_name)
+            cursor.callproc('searchOneEvidence', args)
+            data = cursor.fetchall()
+
+            cw.writerow([i[0] for i in cursor.description])
+            cw.writerows(data)
+            response = make_response(si.getvalue())
+            response.headers['Content-Disposition'] = 'attachment; filename=report.csv'
+            response.headers["Content-type"] = "text/csv"
+            conn.close()
+            return response
+           
 
 
 @app.route('/signUp',methods=['POST','GET'])

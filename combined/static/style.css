@@ -1,3 +1,4 @@
+
 body            { font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;}
 a, h1, h2       { color: #377ba8; }
 h1, h2          { margin: 0; }
@@ -16,6 +17,17 @@ table.dataframe, .dataframe th, .dataframe td {
   color: white;
 }
 
+#panel, #filter {
+    padding: 3px;
+    text-align: center;
+    background-color: #e5eecc;
+    border: solid 1px #c3c3c3;
+}
+
+#panel {
+    padding: 50px;
+    display: none;
+}
 /*.male th {
     background-color: #add8e6;
     color: white;

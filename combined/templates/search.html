@@ -2,19 +2,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <script type="text/javascript">
+    <!--<script type="text/javascript">
     function set_keyword(query, evidence)
     {
         form = document.forms['search'];
         form.elements['query'].value = query;
         form.elements['evidence'].value = evidence;
+        //form.elements['evidences'].value = evidences;
     }
-    </script>
+    </script>-->
+    <script> 
+    $(document).ready(function(){
+        //toggle for evidence type
+        $("#filter").click(function(){
+            $("#panel").slideToggle("slow");
+        });
+        //check all button function
+        $("#checkall").click(function(){
+            $('input:checkbox').not(this).prop('checked', this.checked);
+        });
+        //auto suggestion in search box
+        $.ajax({
+            url: '{{ url_for("autocomplete") }}'
+            }).done(function (data) {
+                $('#query').autocomplete({
+                    source: data.json_list,
+                    minLength: 2
+                });
+            });
+    });
+</script>
+
     <h1>Search</h1>
     <form action="" method="post" name="search">
         {{ form.hidden_tag() }}
         <p>
-            Please enter your keyword below:<br>
+            Please enter your drug name below:<br>
             {{ form.query(size=80) }}
             {% for error in form.query.errors %}
                 <span style="color: red;">[{{ error }}]</span>
@@ -23,13 +46,20 @@
             <!--    <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">{{ pr.name }}</a> |
             {% endfor %}-->
         </p>
-        <p> 
+        <!--<p> 
             Please select your evidence type below:<br>
             {{ form.evidence(size=80) }}
             {% for error in form.query.errors %}
                 <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}<br>
-        <p>{{ form.evi1 }} evi1 {{ form.evi2 }} evi2</p>
+            {% endfor %}<br>-->
+        <!-- Filter options -->
+        <div id='filter'><h4>Evidence Type<h4></div>
+        <div id='panel'>
+            {{ form.checkall }}all<br>
+            {{ form.evia }}evia<br>
+            {{ form.evib }}evib<br>
+            threshold: {{ form.threshold }}<br>
+        </div>
         <p><input type="submit" value="Search"></p>
     </form>
 {% endblock %}
