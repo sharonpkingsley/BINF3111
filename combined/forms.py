@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, widgets, SelectMultipleField
+from wtforms import StringField, BooleanField, widgets, FloatField
 from wtforms.validators import DataRequired
 
 #class MultiCheckboxField(SelectMultipleField):
@@ -10,9 +10,10 @@ class SearchForm(FlaskForm):
     query = StringField('keyword', validators=[DataRequired()])
     evidence = StringField('evidence', validators=[DataRequired()])
     checkall = BooleanField('all')
-    evia = BooleanField('evia')
-    evib = BooleanField('evib')
-    threshold = StringField('threshold', render_kw={"placeholder": "0"})
+    evidence1 = BooleanField('evidence1')
+    evidence2 = BooleanField('evidence2')
+    evidence3 = BooleanField('evidence3')
+    threshold = FloatField('threshold', default = 0, render_kw={"placeholder": "0"})
     
 #    evidences_list = [('evi1','evi1'), ('evi2','evi2'),('evi3','evi3')]
 

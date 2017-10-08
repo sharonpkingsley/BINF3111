@@ -10,7 +10,8 @@
         form.elements['evidence'].value = evidence;
         //form.elements['evidences'].value = evidences;
     }
-    </script>-->
+    </script>
+    -->
     <script> 
     $(document).ready(function(){
         //toggle for evidence type
@@ -22,14 +23,7 @@
             $('input:checkbox').not(this).prop('checked', this.checked);
         });
         //auto suggestion in search box
-        $.ajax({
-            url: '{{ url_for("autocomplete") }}'
-            }).done(function (data) {
-                $('#query').autocomplete({
-                    source: data.json_list,
-                    minLength: 2
-                });
-            });
+        
     });
 </script>
 
@@ -56,8 +50,9 @@
         <div id='filter'><h4>Evidence Type<h4></div>
         <div id='panel'>
             {{ form.checkall }}all<br>
-            {{ form.evia }}evia<br>
-            {{ form.evib }}evib<br>
+            {{ form.evidence1 }}evidence1<br>
+            {{ form.evidence2 }}evidence2<br>
+            {{ form.evidence3 }}evidence3<br>
             threshold: {{ form.threshold }}<br>
         </div>
         <p><input type="submit" value="Search"></p>

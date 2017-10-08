@@ -2,7 +2,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <!doctype html>
     <title>File Successfully uploaded</title>
     <h1>File successfully uploaded</h1>
+    <script>
+	function goBack() {
+    	window.history.back()
+	}
+	</script>
+
+	<button onclick="goBack()">Upload more...</button>
 {% endblock %}

@@ -32,6 +32,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 
+#evidence list
+evi_list = ['evidence1', 'evidence2', 'evidence3']
+
 # file format check ########TO DO#######
 def allowed_file(filename):
     return '.' in filename and \
@@ -48,10 +51,6 @@ def upload_file():
                     filename = secure_filename(file.filename)
                     saveLocation = app.config['UPLOAD_FOLDER'] + filename
                     file.save(saveLocation)
-            #file.save(filepath)
-            #token = store_in_db(filepath)
-            #return redirect(url_for('read_uploaded_file',
-            #                        filename=filename))
                     df1 = pd.read_csv(saveLocation)
                     engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
                     df1.to_sql(evidence_name, con=engine, if_exists='replace')
@@ -59,7 +58,7 @@ def upload_file():
         except Exception as e:
             return render_template('error.html', error = 'No file selected or no evidence entered!')
     else:
-        return render_template('upload.html', evidence_list = ['evia', 'evib'])
+        return render_template('upload.html', evidence_list = evi_list)
 
 # main page
 @app.route('/', methods=['GET', 'POST'])
@@ -71,9 +70,10 @@ def main():
 def search():
     if request.method == 'POST':
        try:
-                _query = request.form['query']
+                query = request.form['query']
+                threshold = request.form['threshold']
+                print threshold
                 #get list
-                evi_list = ['evia', 'evib']
                 chosen_evis = []
                 for evi in evi_list:
                     try:
@@ -82,25 +82,22 @@ def search():
                     except Exception as e:
                         print 'skip' + evi
                 #print chosen_evis
-                return redirect(url_for('result', query=_query, evidence = chosen_evis))
+                print query, chosen_evis, threshold
+                return redirect(url_for('result', query=query, evidence = chosen_evis, threshold = threshold))
        except Exception as e:
                 return render_template('error.html', error= 'Drug or evidence name is missing.')
        
        
     else:
         form = SearchForm()
-        #if form.validate_on_submit():
-        #    flash('Search requested for query="%s"' %
-        #          (form.query.data))
-        #    return redirect(url_for('result', query=form.query.data), evidence=form.evidence.data)
         return render_template('search.html',
                                title='Search',
                                form=form)
 
 
 # result page
-@app.route('/result/<query>/<evidence>', methods=['GET','POST'])
-def result(query,evidence):
+@app.route('/result/<query>/<evidence>/<threshold>', methods=['GET','POST'])
+def result(query,evidence, threshold):
     # format unicode into string - correct format to input into database
     formatted_evidence = str(evidence).replace("[",'')
     formatted_evidence = formatted_evidence.replace(']','')
@@ -108,28 +105,51 @@ def result(query,evidence):
     formatted_evidence = formatted_evidence.replace(" ",'')
     print formatted_evidence
     evidences = formatted_evidence.split(",")
-        
+    
+    while len(evidences) < 3:
+        evidences.append('')
+    print evidences
+    
     if request.method == 'GET':
         # DATA RETRIEVATION
         conn = mysql.connect()
         cursor = conn.cursor()
         datadf_htmls = []
         titles = ['na']
+        #for evi in evidences:
+        #    print evi
+        #    args = (query, evi)
+        #    cursor.callproc('searchOneEvidence', args)
+        #    
+        #    data = cursor.fetchall()
+        #    datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
+        #    datadf.set_index(['Name'],inplace = True)
+        #    datadf.index.name = None
+        #    print datadf
+        #    data_table = datadf.to_html()
+        #    titles.append('Drugs with evidence '+ evi)
+        #    datadf_htmls.append(datadf.to_html(classes='male'))
+        #    print titles
+
+        args =(query, evidences[0], evidences[1], evidences[2], int(threshold))
+        print args
+        cursor.callproc('searchMaxThreeSelectedEvidence', args)
+        print 'here'
+        data = cursor.fetchall()
+        columns = ['Name']
         for evi in evidences:
-            print evi
-            args = (query, evi)
-            cursor.callproc('searchOneEvidence', args)
-    
-            data = cursor.fetchall()
-            datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
-            datadf.set_index(['Name'],inplace = True)
-            datadf.index.name = None
-            print datadf
-            data_table = datadf.to_html()
-            titles.append('Drugs with evidence '+ evi)
-            datadf_htmls.append(datadf.to_html(classes='male'))
-            print titles
-    
+            if evi is not '':
+                columns.append(evi)
+        columns.append('Score')
+        print columns
+
+
+        datadf = pd.DataFrame(list(data), columns = columns)
+        datadf.set_index(['Name'], inplace= True)
+        datadf.index.name = None
+        print datadf
+        titles.append('Drugs with evidence' + (', ').join(evidences))
+
         conn.close()
         #print data
         #print type(data)
@@ -143,7 +163,7 @@ def result(query,evidence):
 
         if len(data) >0:
         # no url change now
-            return render_template('result.html',tables=datadf_htmls, titles = titles)
+            return render_template('result.html',tables=[datadf.to_html(classes = 'male')], titles = titles)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
@@ -179,12 +199,12 @@ def script():
 
 NAMES=["abc","abcd","abcde","abcdef"]
 
-@app.route('/autocomplete',methods=['GET'])
-def autocomplete():
-    search = request.args.get('query')
+#@app.route('/autocomplete',methods=['GET'])
+#def autocomplete():
+#    search = request.args.get('query')
 
-    app.logger.debug(search)
-    return jsonify(json_list=NAMES) 
+#    app.logger.debug(search)
+#    return jsonify(json_list=NAMES) 
 
 # get evidence list
 def get_evis():
