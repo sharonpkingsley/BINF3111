@@ -39,6 +39,8 @@ begin
         PREPARE re FROM @updateTable;
         EXECUTE re;
         DEALLOCATE PREPARE re;
+        #update the null part into 0
+        update final_result set evidence1 = 0 where evidence1 is null;
 
     end if;
     if evi2 <> '' then
@@ -52,6 +54,8 @@ begin
         PREPARE re FROM @updateTable;
         EXECUTE re;
         DEALLOCATE PREPARE re;
+        #update the null part into 0
+        update final_result set evidence2 = 0 where evidence2 is null;
     end if;#
 
     if evi3 <> '' then 
@@ -65,12 +69,9 @@ begin
         PREPARE re FROM @updateTable;
         EXECUTE re;
         DEALLOCATE PREPARE re;
+        update final_result set evidence3 = 0 where evidence3 is null;
     end if;
 
-    #update the null part into 0
-    update final_result set evidence1 = 0 where evidence1 is null;
-    update final_result set evidence2 = 0 where evidence2 is null;
-    update final_result set evidence3 = 0 where evidence3 is null;
 
     #add the score column
     set @tempTableName = 'Score';
@@ -78,7 +79,8 @@ begin
     PREPARE result FROM @tt;
     EXECUTE result;
     DEALLOCATE PREPARE result;
-
+    
+    #select * from final_result;
     if @total_amount = 1 then
         if evi1 <> '' then
             set @evidence_name = evi1;
@@ -86,17 +88,14 @@ begin
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
-        end if;
-
+        end if;#
         if evi2 <> '' then
             set @evidence_name = evi2;
             set @updateTable = concat('update ', @tempTable, ' f inner join ', @evidence_name, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;
-
-        end if;
-
+            DEALLOCATE PREPARE re;#
+        end if;#
         if evi3 <> '' then
             set @evidence_name = evi3;
             set @updateTable = concat('update ', @tempTable, ' f inner join ', @evidence_name, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
@@ -122,8 +121,7 @@ begin
             set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,')+sum(', evi3,'))/2 as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;
-
+            DEALLOCATE PREPARE re;#
         end if;
         if evi2 <> '' and evi3 <> '' then
             set @firt_column = 'all_drug_name';
@@ -132,8 +130,7 @@ begin
             set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi2 ,')+sum(', evi3,'))/2 as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;
-
+            DEALLOCATE PREPARE re;#
         end if;
     elseif @total_amount = 3 then
         set @firt_column = 'all_drug_name';
@@ -144,8 +141,7 @@ begin
         EXECUTE re;
         DEALLOCATE PREPARE re;
     end if;
-
-
+    select * from final_result;
 #    set @updateTable = concat('update ', @tempTable, ' f inner join ', @tempTableName, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
 #    PREPARE re FROM @updateTable;
 #    EXECUTE re;
@@ -153,6 +149,6 @@ begin
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('ANWABDrug','evidence1','evidence2','evidence3',1);
+call searchMaxThreeSelectedEvidence('ANWABDrug','evidence1','','',1);
 
 
