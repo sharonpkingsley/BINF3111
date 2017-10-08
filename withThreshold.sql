@@ -5,7 +5,7 @@
 drop procedure if exists searchMaxThreeSelectedEvidence;
 DELIMITER $$
 create procedure searchMaxThreeSelectedEvidence(IN drugName VARCHAR(255), IN evi1 VARCHAR(255), IN evi2 VARCHAR(255), 
-IN evi3 VARCHAR(255), IN threshold int)
+IN evi3 VARCHAR(255), IN threshold float)
 begin
     DECLARE done int default false;
     DECLARE table_name CHAR(255);
