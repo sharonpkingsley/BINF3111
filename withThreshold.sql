@@ -5,7 +5,7 @@
 drop procedure if exists searchMaxThreeSelectedEvidence;
 DELIMITER $$
 create procedure searchMaxThreeSelectedEvidence(IN drugName VARCHAR(255), IN evi1 VARCHAR(255), IN evi2 VARCHAR(255), 
-IN evi3 VARCHAR(255), IN threshold float)
+IN evi3 VARCHAR(255), IN threshold int)
 begin
     DECLARE done int default false;
     DECLARE table_name CHAR(255);
@@ -84,21 +84,21 @@ begin
     if @total_amount = 1 then
         if evi1 <> '' then
             set @evidence_name = evi1;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ', @evidence_name, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,'))/1 as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
         end if;#
         if evi2 <> '' then
             set @evidence_name = evi2;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ', @evidence_name, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi2 ,'))/1 as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;#
         end if;#
         if evi3 <> '' then
             set @evidence_name = evi3;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ', @evidence_name, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi3 ,'))/1 as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -142,13 +142,10 @@ begin
         DEALLOCATE PREPARE re;
     end if;
     select * from final_result;
-#    set @updateTable = concat('update ', @tempTable, ' f inner join ', @tempTableName, ' e on f.all_drug_name = e.`Unnamed: 0` set f.', @tempTableName, ' = e.',drugName);
-#    PREPARE re FROM @updateTable;
-#    EXECUTE re;
-#    DEALLOCATE PREPARE re;
+
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('ANWABDrug','evidence1','','',1);
+call searchMaxThreeSelectedEvidence('ANWABDrug','','evidence2','',1);
 
 
