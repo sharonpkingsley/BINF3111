@@ -5,7 +5,7 @@
 drop procedure if exists searchMaxThreeSelectedEvidence;
 DELIMITER $$
 create procedure searchMaxThreeSelectedEvidence(IN drugName VARCHAR(255), IN evi1 VARCHAR(255), IN evi2 VARCHAR(255), 
-IN evi3 VARCHAR(255), IN threshold int)
+IN evi3 VARCHAR(255), IN threshold float)
 begin
     DECLARE done int default false;
     DECLARE table_name CHAR(255);
@@ -40,7 +40,7 @@ begin
         EXECUTE re;
         DEALLOCATE PREPARE re;
         #update the null part into 0
-        update final_result set evidence1 = 0 where evidence1 is null;
+        #update final_result set evidence1 = 0 where evidence1 is null;
 
     end if;
     if evi2 <> '' then
@@ -55,7 +55,7 @@ begin
         EXECUTE re;
         DEALLOCATE PREPARE re;
         #update the null part into 0
-        update final_result set evidence2 = 0 where evidence2 is null;
+        #update final_result set evidence2 = 0 where evidence2 is null;
     end if;#
 
     if evi3 <> '' then 
@@ -69,7 +69,7 @@ begin
         PREPARE re FROM @updateTable;
         EXECUTE re;
         DEALLOCATE PREPARE re;
-        update final_result set evidence3 = 0 where evidence3 is null;
+        #update final_result set evidence3 = 0 where evidence3 is null;
     end if;
 
 
@@ -141,11 +141,12 @@ begin
         EXECUTE re;
         DEALLOCATE PREPARE re;
     end if;
+    #select * from final_result where evidence2 is not NULL or evidence3 is not NULL;
     select * from final_result;
-
+    drop table final_result;
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('ANWABDrug','','evidence2','',1);
+call searchMaxThreeSelectedEvidence('ANWABDrug','evidence3','evidence2','',0.7);
 
 
