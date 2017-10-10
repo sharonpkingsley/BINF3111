@@ -114,7 +114,6 @@ def result(query,evidence, threshold):
         # DATA RETRIEVATION
         conn = mysql.connect()
         cursor = conn.cursor()
-        datadf_htmls = []
         titles = ['na']
         #for evi in evidences:
         #    print evi
@@ -148,7 +147,7 @@ def result(query,evidence, threshold):
         datadf.set_index(['Name'], inplace= True)
         datadf.index.name = None
         print datadf
-        titles.append('Drugs with evidence' + (', ').join(evidences))
+        titles.append('Drugs with evidence ' + (', ').join(evidences))
 
         conn.close()
         #print data
@@ -178,17 +177,16 @@ def result(query,evidence, threshold):
             cursor = conn.cursor()
             si = StringIO.StringIO()
             cw = csv.writer(si)
-            for evi in evidences:
-                print evi
-                args = (query, evi)
-                cursor.callproc('searchOneEvidence', args)
-                data = cursor.fetchall()
+            args =(query, evidences[0], evidences[1], evidences[2], int(threshold))
+            print args
+            cursor.callproc('searchMaxThreeSelectedEvidence', args)
+            data = cursor.fetchall()
 
-                cw.writerow([i[0] for i in cursor.description])
-                cw.writerows(data)
-                response = make_response(si.getvalue())
-                response.headers['Content-Disposition'] = 'attachment; filename=report.csv'
-                response.headers["Content-type"] = "text/csv"
+            cw.writerow([i[0] for i in cursor.description])
+            cw.writerows(data)
+            response = make_response(si.getvalue())
+            response.headers['Content-Disposition'] = 'attachment; filename=report.csv'
+            response.headers["Content-type"] = "text/csv"
             conn.close()
             return response
         
@@ -197,14 +195,24 @@ def result(query,evidence, threshold):
 def script():
     return render_template('cytoscape1.js')    
 
-NAMES=["abc","abcd","abcde","abcdef"]
+@app.route('/autocomplete',methods=['GET'])
+def autocomplete():
 
-#@app.route('/autocomplete',methods=['GET'])
-#def autocomplete():
-#    search = request.args.get('query')
+    search = request.args.get('q')
+#   results = ['Beer', 'Wine', 'Soda', 'Juice', 'Water']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    sql=("select `Unnamed: 0` from  evidence1 where `Unnamed: 0` like '%"+search+"%'")
+    print sql
+    cursor.execute(sql)
+    symbols = cursor.fetchall()
+    results = [mv[0] for mv in symbols]
+    print results
+    cursor.close()
+    conn.close()
 
-#    app.logger.debug(search)
-#    return jsonify(json_list=NAMES) 
+
+    return jsonify(matching_results=results)
 
 # get evidence list
 def get_evis():

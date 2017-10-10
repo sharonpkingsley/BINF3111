@@ -2,16 +2,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <!--<script type="text/javascript">
-    function set_keyword(query, evidence)
-    {
-        form = document.forms['search'];
-        form.elements['query'].value = query;
-        form.elements['evidence'].value = evidence;
-        //form.elements['evidences'].value = evidences;
-    }
-    </script>
-    -->
+
     <script> 
     $(document).ready(function(){
         //toggle for evidence type
@@ -23,7 +14,19 @@
             $('input:checkbox').not(this).prop('checked', this.checked);
         });
         //auto suggestion in search box
-        
+        $("#query").autocomplete({
+            source:function(request, response) {
+                $.getJSON("{{url_for('autocomplete')}}",{
+                    q: request.term, // in flask, "q" will be the argument to look for using request.args
+                }, function(data) {
+                    response(data.matching_results); // matching_results from jsonify
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                console.log(ui.item.value); // not in your question, but might help later
+            }
+        });
     });
 </script>
 
