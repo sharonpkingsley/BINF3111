@@ -164,11 +164,11 @@ def result(query,evidence, threshold):
 
         if len(data) >0:
         # no url change now
-            return render_template('result.html',tables=[datadf.to_html()], titles = titles)
+            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
-        if request.form['submit'] == 'Get Data':
+        #if request.form['submit'] == 'Get Data':
             #query = request.form['drug']
             #evidence_input_name = get_evis()
             #print drug_input_name
