@@ -146,9 +146,11 @@ def result(query,evidence, threshold):
         datadf = pd.DataFrame(list(data), columns = columns)
         datadf.set_index(['Name'], inplace= True)
         datadf.index.name = None
-        print datadf
+        datadf2 = datadf.style.format("{:.2%}")
+        print datadf.style.format("{:.2%}")
         titles.append('Drugs with evidence ' + (', ').join(evidences))
-
+        print datadf
+        
         conn.close()
         #print data
         #print type(data)
@@ -162,7 +164,7 @@ def result(query,evidence, threshold):
 
         if len(data) >0:
         # no url change now
-            return render_template('result.html',tables=[datadf.to_html(classes = 'male')], titles = titles)
+            return render_template('result.html',tables=[datadf.to_html()], titles = titles)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':

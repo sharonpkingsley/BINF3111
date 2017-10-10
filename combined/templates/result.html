@@ -5,7 +5,7 @@
     <h1>Result</h1>
         <p>
         	{% for table in tables %}
-    		<h2>{{titles[loop.index]}}</h2>
+    		<h3>{{titles[loop.index]}}</h3>
     		{{ table|safe }}
   			{% endfor %}
         </p>

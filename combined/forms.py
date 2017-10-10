@@ -7,7 +7,7 @@ from wtforms.validators import DataRequired
 #    option_widget = widgets.CheckboxInput()
 
 class SearchForm(FlaskForm):
-    query = StringField('keyword', validators=[DataRequired()])
+    query = StringField('keyword', validators=[DataRequired()], render_kw={"class": "form-control"})
     evidence = StringField('evidence', validators=[DataRequired()])
     checkall = BooleanField('all')
     evidence1 = BooleanField('evidence1')
