@@ -48,12 +48,11 @@ def upload_file():
 					filename = secure_filename(file.filename)
 					saveLocation = app.config['UPLOAD_FOLDER'] + filename
 					file.save(saveLocation)
-			#file.save(filepath)
-			#token = store_in_db(filepath)
-			#return redirect(url_for('read_uploaded_file',
-			#                        filename=filename))
+			
 					df1 = pd.read_csv(saveLocation)
-					engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
+					engine1 = create_engine('mysql://root:1234@localhost', echo=True)
+					engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
+					engine = create_engine('mysql://root:1234@localhost/drugdb', echo=True)
 					df1.to_sql(evidence_name, con=engine, if_exists='replace')
 					return render_template('upload_success.html')
 		except Exception as e:
@@ -187,12 +186,16 @@ def autocomplete():
 #	results = ['Beer', 'Wine', 'Soda', 'Juice', 'Water']
 	conn = mysql.connect()
 	cursor = conn.cursor()
-	sql=("select `Unnamed: 0` from  evidence1 where `Unnamed: 0` like '%"+search+"%'")
+	#create_table = ("select concat(ID, ' ', `GENERIC NAME`) as full_name from evia")
+	#cursor.execute(create_table)
+	sql=("select CONCAT(ID, ' ', `GENERIC NAME`) from  evia where ID like '%"+search+"%' or `GENERIC NAME` like '%"+search+"%'")
 	print sql
 	cursor.execute(sql)
 	symbols = cursor.fetchall()
 	results = [mv[0] for mv in symbols]
 	print results
+
+	#cursor.execute()
 	cursor.close()
 	conn.close()
 
