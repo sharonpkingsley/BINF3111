@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 
 from flask import send_file
 from flask import make_response  
+
 #mysql setup
 mysql = MySQL()
 app = Flask(__name__)
@@ -120,21 +121,7 @@ def result(query,evidence, threshold):
         conn = mysql.connect()
         cursor = conn.cursor()
         titles = ['na']
-        #for evi in evidences:
-        #    print evi
-        #    args = (query, evi)
-        #    cursor.callproc('searchOneEvidence', args)
-        #    
-        #    data = cursor.fetchall()
-        #    datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
-        #    datadf.set_index(['Name'],inplace = True)
-        #    datadf.index.name = None
-        #    print datadf
-        #    data_table = datadf.to_html()
-        #    titles.append('Drugs with evidence '+ evi)
-        #    datadf_htmls.append(datadf.to_html(classes='male'))
-        #    print titles
-
+        
         args =(query, evidences[0], evidences[1], evidences[2], threshold)
         print args
         cursor.callproc('searchMaxThreeSelectedEvidence', args)
@@ -155,27 +142,13 @@ def result(query,evidence, threshold):
         print datadf
         
         conn.close()
-        #print data
-        #print type(data)
-        #datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
-        #datadf.set_index(['Name'],inplace = True)
-        #datadf.index.name = None
-        #print datadf
-        #data_table = datadf.to_html()
-        #titles = ['na']
-        #titles.append('Drugs with evidence '+ evidence)
-
+        
         if len(data) >0:
         # no url change now
             return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
-        #if request.form['submit'] == 'Get Data':
-            #query = request.form['drug']
-            #evidence_input_name = get_evis()
-            #print drug_input_name
-            #print evidence_input_name
             print evidences
             print query
             conn = mysql.connect()
@@ -204,11 +177,8 @@ def script():
 def autocomplete():
 
     search = request.args.get('q')
-#   results = ['Beer', 'Wine', 'Soda', 'Juice', 'Water']
     conn = mysql.connect()
     cursor = conn.cursor()
-    #create_table = ("select concat(ID, ' ', `GENERIC NAME`) as full_name from evia")
-    #cursor.execute(create_table)
     sql=("select CONCAT(ID, ' ', `GENERIC NAME`) from  info where ID like '%"+search+"%' or `GENERIC NAME` like '%"+search+"%'")
     print sql
     cursor.execute(sql)
@@ -216,7 +186,6 @@ def autocomplete():
     results = [mv[0] for mv in symbols]
     print results
 
-    #cursor.execute()
     cursor.close()
     conn.close()
 
