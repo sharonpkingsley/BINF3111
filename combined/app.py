@@ -33,7 +33,7 @@ app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 
 #evidence list
-evi_list = ['evidence1', 'evidence2', 'evidence3']
+evi_list = ['Target', 'Struct', 'Chem']
 
 # file format check ########TO DO#######
 def allowed_file(filename):
@@ -43,8 +43,7 @@ def allowed_file(filename):
 # upload page
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    type_list = evi_list
-    type_list.append('info')
+    type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info']
     if request.method == 'POST':
         try:
                 file = request.files['file']
@@ -62,7 +61,7 @@ def upload_file():
         except Exception as e:
             return render_template('error.html', error = 'No file selected or no evidence entered!')
     else:
-        return render_template('upload.html', evidence_list = evi_list)
+        return render_template('upload.html', evidence_list = type_list)
 
 # main page
 @app.route('/', methods=['GET', 'POST'])
