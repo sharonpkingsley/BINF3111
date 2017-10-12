@@ -10,7 +10,7 @@
     
     	<table>
           <td>
-          <label>Evidence Name:</label>
+          <label>File type: </label>
       	    <select name="option" width="300px">
             {% for x in evidence_list %}
 			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
