@@ -2,9 +2,15 @@
 {% extends "base.html" %}
 
 {% block content %}
+   <div class='container'>
     <h1>Index</h1>
         <p>
-        	<button class="btn btn-default" onclick="window.location.href='search'">Search</button><br><br>
-        	<button class="btn btn-default" onclick="window.location.href='upload'">Upload</button>
+        	<button class="btn btn-default" onclick="window.location.href='search'">
+        		<span class="glyphicon glyphicon-search"></span> Search
+        	</button><br><br>
+        	<button class="btn btn-default" onclick="window.location.href='upload'">
+        		<span class="glyphicon glyphicon-upload"></span> Upload
+        	</button>
         </p>
+   </div>
 {% endblock %}

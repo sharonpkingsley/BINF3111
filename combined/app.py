@@ -82,6 +82,8 @@ def search():
                     except Exception as e:
                         print 'skip' + evi
                 #print chosen_evis
+                if chosen_evis == []:
+                    raise ValueError('No evidence selected!')
                 print query, chosen_evis, threshold
                 return redirect(url_for('result', query=query, evidence = chosen_evis, threshold = threshold))
        except Exception as e:
@@ -130,7 +132,7 @@ def result(query,evidence, threshold):
         #    datadf_htmls.append(datadf.to_html(classes='male'))
         #    print titles
 
-        args =(query, evidences[0], evidences[1], evidences[2], int(threshold))
+        args =(query, evidences[0], evidences[1], evidences[2], threshold)
         print args
         cursor.callproc('searchMaxThreeSelectedEvidence', args)
         print 'here'
@@ -146,8 +148,6 @@ def result(query,evidence, threshold):
         datadf = pd.DataFrame(list(data), columns = columns)
         datadf.set_index(['Name'], inplace= True)
         datadf.index.name = None
-        datadf2 = datadf.style.format("{:.2%}")
-        print datadf.style.format("{:.2%}")
         titles.append('Drugs with evidence ' + (', ').join(evidences))
         print datadf
         
@@ -179,7 +179,7 @@ def result(query,evidence, threshold):
             cursor = conn.cursor()
             si = StringIO.StringIO()
             cw = csv.writer(si)
-            args =(query, evidences[0], evidences[1], evidences[2], int(threshold))
+            args =(query, evidences[0], evidences[1], evidences[2], threshold)
             print args
             cursor.callproc('searchMaxThreeSelectedEvidence', args)
             data = cursor.fetchall()
@@ -215,18 +215,6 @@ def autocomplete():
 
 
     return jsonify(matching_results=results)
-
-# get evidence list
-def get_evis():
-    evi_list = ['evia', 'evib']
-    chosen_evis = []
-    for evi in evi_list:
-            try:
-                if request.form[str(evi)] == 'y':
-                    chosen_evis.append(evi)
-            except Exception as e:
-                print 'skip' + evi
-    return chosen_evis
 
 
 #export the data

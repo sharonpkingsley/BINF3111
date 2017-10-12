@@ -20,7 +20,14 @@
     {% endif %}
   </head>
   <body>
-    <div><h4>DrugSim: <a href="/">Home</a></h4></div>
+    <div><h4>DrugSim: <a class='btn btn-default' href="/">Home</a> <a class='btn btn-default' onclick="goBack()">Back</a> <a class='btn btn-default' href='#'>Help</a></h4></div>
+    
+    <script>
+    function goBack() {
+        window.history.back()
+    }
+    </script>
+
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

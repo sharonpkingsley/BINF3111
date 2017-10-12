@@ -3,12 +3,10 @@
 
 {% block content %}
     <title>File Successfully uploaded</title>
+    <div class='container'>
     <h1>File successfully uploaded</h1>
-    <script>
-	function goBack() {
-    	window.history.back()
-	}
-	</script>
-
-	<button onclick="goBack()">Upload more...</button>
+    	<a href="/upload" class="btn btn-default">
+      		<span class="glyphicon glyphicon-upload"></span> Upload More... 
+    	</a>
+	</div>
 {% endblock %}
