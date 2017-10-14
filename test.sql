@@ -99,6 +99,11 @@ begin
             close cur3; 
         end if;
 
+        #update the null part into 0
+        set @updateTableNULL = concat('update ', @tempTable, ' set ', evi1, '= 0 where ', evi1, ' is null');
+        PREPARE re1 FROM @updateTableNULL;
+        EXECUTE re1;
+        DEALLOCATE PREPARE re1;
 
     end if;
     #select * from final_result;
@@ -167,6 +172,10 @@ begin
             DEALLOCATE PREPARE re;
             close cur3; 
         end if;
+        set @updateTableNULL = concat('update ', @tempTable, ' set ', evi2, '= 0 where ', evi2, ' is null');
+        PREPARE re1 FROM @updateTableNULL;
+        EXECUTE re1;
+        DEALLOCATE PREPARE re1;
 
     end if;
 
@@ -234,6 +243,11 @@ begin
             DEALLOCATE PREPARE re;
             close cur3; 
         end if;
+
+        set @updateTableNULL = concat('update ', @tempTable, ' set ', evi3, '= 0 where ', evi3, ' is null');
+        PREPARE re1 FROM @updateTableNULL;
+        EXECUTE re1;
+        DEALLOCATE PREPARE re1;
     end if;
 
     #add the score column
@@ -310,6 +324,6 @@ begin
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('DB00014','Target','Chem','Struct',0.07);
+call searchMaxThreeSelectedEvidence('DB00014','Target','','',0.07);
 
 
