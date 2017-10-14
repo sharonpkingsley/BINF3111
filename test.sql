@@ -50,7 +50,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -71,7 +71,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ',drugName,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -92,7 +92,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -124,7 +124,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -144,7 +144,7 @@ begin
                 end if;
             set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -166,7 +166,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -195,7 +195,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -215,7 +215,7 @@ begin
                 end if;
             set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -237,7 +237,7 @@ begin
                 end if;
                 set @tempTableName = table_name;
             end loop;
-            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, ', drugName, ' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+            set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
@@ -265,13 +265,15 @@ begin
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi1 <> 0;
         end if;
         if evi2 <> '' then
             set @evidence_name = evi2;
             set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi2 ,'))/1  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;#
+            DEALLOCATE PREPARE re;
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi2 <> 0;
         end if;
         if evi3 <> '' then
             set @evidence_name = evi3;
@@ -279,51 +281,56 @@ begin
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
-        
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi3 <> 0;
         end if;
+
     elseif @total_amount = 2 then
         if evi1 <> '' and evi2 <> '' then
             set @firt_column = 'all_drug_name';
             set @average = 'average';
             #update final_result f inner join (select all_drug_name, (sum(evidence1) + sum(evidence2))/2 as average from final_result group by all_drug_name) a on a.all_drug_name = f.all_drug_name set f.Score= a.average;
-            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,')+sum(', evi2,'))/2  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', round((sum(', evi1 ,')+sum(', evi2,'))/2,3)  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
             DEALLOCATE PREPARE re;
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi1 <> 0 and evi2 <> 0;
         end if;
         if evi1 <> '' and evi3 <> '' then
             set @firt_column = 'all_drug_name';
             set @average = 'average';
             #update final_result f inner join (select all_drug_name, (sum(evidence1) + sum(evidence2))/2 as average from final_result group by all_drug_name) a on a.all_drug_name = f.all_drug_name set f.Score= a.average;
-            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,')+sum(', evi3,'))/2  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', round((sum(', evi1 ,')+sum(', evi3,'))/2,3)  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;#
+            DEALLOCATE PREPARE re;
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi1 <> 0 and evi3 <> 0;
         end if;
         if evi2 <> '' and evi3 <> '' then
             set @firt_column = 'all_drug_name';
             set @average = 'average';
             #update final_result f inner join (select all_drug_name, (sum(evidence1) + sum(evidence2))/2 as average from final_result group by all_drug_name) a on a.all_drug_name = f.all_drug_name set f.Score= a.average;
-            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi2 ,')+sum(', evi3,'))/2  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
+            set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', round((sum(', evi2 ,')+sum(', evi3,'))/2,3)  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
             PREPARE re FROM @updateTable;
             EXECUTE re;
-            DEALLOCATE PREPARE re;#
+            DEALLOCATE PREPARE re;
+            #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi2 <> 0 and evi2 <> 0;
         end if;
     elseif @total_amount = 3 then
         set @firt_column = 'all_drug_name';
         set @average = 'average';
         #update final_result f inner join (select all_drug_name, (sum(evidence1) + sum(evidence2))/2 as average from final_result group by all_drug_name) a on a.all_drug_name = f.all_drug_name set f.Score= a.average;
-        set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,')+sum(', evi2,')+sum(',evi3,'))/3  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
+        set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', round((sum(', evi1 ,')+sum(', evi2,')+sum(',evi3,'))/3,3)  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
         PREPARE re FROM @updateTable;
         EXECUTE re;
         DEALLOCATE PREPARE re;
+        #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi1 <> 0 and evi2 <> 0 and evi3 <> 0;
     end if;
 
-    select * from final_result where Score > threshold and all_drug_ID <> drugName;
+    select * from final_result where Score > threshold and all_drug_ID <> drugName and Score <> 0;
     drop table final_result;
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('DB00014','Target','','',0.07);
+call searchMaxThreeSelectedEvidence('DB00014','Target','','Chem',0.07);
 
 
