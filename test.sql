@@ -48,6 +48,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
@@ -69,6 +70,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ',drugName,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
@@ -90,6 +92,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
@@ -106,7 +109,6 @@ begin
         DEALLOCATE PREPARE re1;
 
     end if;
-    #select * from final_result;
 
     if evi2 <> '' then 
         set @total_amount = @total_amount +1;
@@ -122,6 +124,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
@@ -142,7 +145,8 @@ begin
                 if done then
                     leave myloop;
                 end if;
-            set @tempTableName = table_name;
+                set @tempTableName = 10;
+                set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
             PREPARE re FROM @updateTable;
@@ -164,6 +168,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
@@ -193,6 +198,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
@@ -213,6 +219,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
             set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
@@ -235,6 +242,7 @@ begin
                 if done then
                     leave myloop;
                 end if;
+                set @tempTableName = 10;
                 set @tempTableName = table_name;
             end loop;
             set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
@@ -331,6 +339,6 @@ begin
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('DB00014','Target','','Chem',0.07);
+call searchMaxThreeSelectedEvidence('DB00014','Target','','',0.07);
 
 
