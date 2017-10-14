@@ -2,6 +2,26 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <script> 
+    $(document).ready(function(){
+        //auto suggestion in search box
+        $(":text").autocomplete({
+            source:function(request, response) {
+                $.getJSON("{{url_for('autocomplete')}}",{
+                    q: request.term, // in flask, "q" will be the argument to look for using request.args
+                }, function(data) {
+                    response(data.matching_results); // matching_results from jsonify
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                console.log(ui.item.value); // not in your question, but might help later
+            }
+        });
+    });
+	</script>
+
+
   <div class="container">
     <title>Upload new File</title>
     <h1>Upload New Files</h1>
@@ -12,14 +32,64 @@
           <td>
           <label>File type: </label>
       	    <select name="option" width="300px">
+            {% for x in type_list %}
+			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
+			{% endfor %}</select>
+          </td>
+        </table><br>
+      <button class="btn btn-default" type=submit value="file" name="button">
+      	<span class="glyphicon glyphicon-upload"></span> Upload
+      </button>
+    </form>
+  </div>
+
+  <div class='container'>
+  	<h1>Add new entry</h1>
+  	<form action="" method=post enctype=multipart/form-data>
+      	
+      	<p>New Drug ID: <input type=text class='form-control' name=drugid></p>
+      	<p>New Drug Name: <input type=text class='form-control' name=drugname></p>
+      	<p>New Drug File: <input type=file name=file></p>
+
+    	<table>
+          <td>
+          <label>Evidence type: </label>
+      	    <select name="option" width="300px">
             {% for x in evidence_list %}
 			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
 			{% endfor %}</select>
           </td>
         </table><br>
-      <button class="btn btn-default" type=submit>
-      	<span class="glyphicon glyphicon-upload"></span> Upload
+
+      <button class="btn btn-default" type=submit value="new_drug" name="button">
+      	<span class="glyphicon glyphicon-upload"></span> Add
       </button>
     </form>
+
+  </div>
+
+   <div class='container'>
+  	<h1>Edit entry</h1>
+  	<form action="" method=post enctype=multipart/form-data>
+      	
+      	<p>Drug A name: <input type=text class='form-control' name=druga></p>
+      	<p>Drug B name: <input type=text class='form-control' name=drugb></p>
+
+    	<table>
+          <td>
+          <label>Evidence type: </label>
+      	    <select name="option" width="300px">
+            {% for x in evidence_list %}
+			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
+			{% endfor %}</select>
+          </td>
+        </table><br>
+
+        <p>Score (between 0 and 1): <input type=number class='form-control' name=score min=0 max=1 step=0.01></p>
+      <button class="btn btn-default" type=submit value="update_drug" name="button">
+      	<span class="glyphicon glyphicon-upload"></span> Update
+      </button>
+    </form>
+
   </div>
 {% endblock %}
