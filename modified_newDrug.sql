@@ -33,11 +33,14 @@ begin
     if evi1 = 'Target' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
-        select @row;
-        PREPARE r FROM @row;
-        EXECUTE r;
-        DEALLOCATE PREPARE r;
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+            select @row;
+            PREPARE r FROM @row;
+            EXECUTE r;
+            DEALLOCATE PREPARE r;
+        end if;
+        #select * from evia;
         #########
         #add the new row for all the table drugbank_id
         open cur1_1;
@@ -135,11 +138,14 @@ begin
     if evi1 = 'Struct' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
-        select @row;
-        PREPARE r FROM @row;
-        EXECUTE r;
-        DEALLOCATE PREPARE r;
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+            select @row;
+            PREPARE r FROM @row;
+            EXECUTE r;
+            DEALLOCATE PREPARE r;
+        end if;
+        #select * from evia;
         #########
         #add the new row for all the table drugbank_id
         open cur2_1;
@@ -231,11 +237,14 @@ begin
     if evi1 = 'Chem' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
-        select @row;
-        PREPARE r FROM @row;
-        EXECUTE r;
-        DEALLOCATE PREPARE r;
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+            select @row;
+            PREPARE r FROM @row;
+            EXECUTE r;
+            DEALLOCATE PREPARE r;
+        end if;
+        #select * from evia;
         #########
         #add the new row for all the table drugbank_id
         open cur3_1;
@@ -342,5 +351,11 @@ DELIMITER ;
 
 
 #update target0 a,  (select DB20000 from target9 where DRUGBANK_ID = 'DB00014') b set a.DB00014 = coalesce(b.DB20000,0) where a.DRUGBANK_ID = 'DB20000';
-
+if not exists(select ID from evia where ID = 'DB30000') THEN 
+            set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+            select @row;
+            PREPARE r FROM @row;
+            EXECUTE r;
+            DEALLOCATE PREPARE r;
+        end if;
 
