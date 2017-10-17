@@ -2,7 +2,29 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class='container'>
+
+<script>
+$(document).ready(function(){
+  $("#query").hyperlink({
+            source:function(request, response) {
+                $.getJSON("{{url_for('hyperlink')}}",{
+                    q: request.term, // in flask, "q" will be the argument to look for using request.args
+                }, function(data) {
+                    response(data.matching_results); // matching_results from jsonify
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                console.log(ui.item.value); // not in your question, but might help later
+            }
+        });
+  $('tbody tr th').each(function(){
+    $(this).html('<a href="#">' + $(this).html() + '</a>')
+  });
+});
+</script>
+
+<div id='result' class='container'>
          
     <h1>Result</h1>
         <p>
@@ -21,4 +43,6 @@
       		<span class="glyphicon glyphicon-search"></span> Search More... 
     	</a>
 </div>
+
+
 {% endblock %}

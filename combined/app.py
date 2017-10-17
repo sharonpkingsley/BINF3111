@@ -74,13 +74,7 @@ def upload_file():
 
                         #minus the first column, which is the name column
                         print total_num_of_columns
-                        additionRange = 0
-                        for i in range(0,15):
-                            if (total_num_of_columns%15 != 0):
-                                additionRange = total_num_of_columns/15 +1
-                            else:
-                                additionRange = total_num_of_columns/15
-
+                        
                         x = 2
                         startX = 2 #always
                         print total_num_of_columns
@@ -110,10 +104,14 @@ def upload_file():
                             os.system('chmod +x cutFile.sh')
                             subprocess.call(['./cutFile.sh', columnRange, str(saveLocation), output_file])
                             dff = pd.read_csv(output_file)
+                            print 'yoki'
                             engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
+                            print 'joki'
                             evidenceTable = str(evidence_name) + str(j)
                             evidenceTableName = evidenceTable.replace(" ", "")
+                            print '3check'
                             dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
+                            print '4check'
                 return render_template('upload_success.html')
             elif request.form['button'] == 'new_drug':
                 print 'pei!!!'
@@ -237,6 +235,23 @@ def script():
 
 @app.route('/autocomplete',methods=['GET'])
 def autocomplete():
+
+    search = request.args.get('q')
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    sql=("select CONCAT(ID, ' ', `GENERIC NAME`) from  info where ID like '%"+search+"%' or `GENERIC NAME` like '%"+search+"%'")
+    cursor.execute(sql)
+    symbols = cursor.fetchall()
+    results = [mv[0] for mv in symbols]
+    
+    cursor.close()
+    conn.close()
+
+
+    return jsonify(matching_results=results)
+
+@app.route('/hyperlink',methods=['GET'])
+def hyperlink():
 
     search = request.args.get('q')
     conn = mysql.connect()
