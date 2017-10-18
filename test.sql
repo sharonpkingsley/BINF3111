@@ -31,7 +31,7 @@ begin
     PREPARE createtb FROM @createtable ; 
     EXECUTE createtb;
     DEALLOCATE PREPARE createtb ;
-    insert into `final_result` select ID, `GENERIC NAME` from evia;
+    insert into `final_result` select ID, `GENERIC NAME` from info;
 
     set @total_amount = 0;
 
