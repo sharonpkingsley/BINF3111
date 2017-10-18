@@ -3,26 +3,91 @@
 
 {% block content %}
 
-<script>
+<!--<script>
 $(document).ready(function(){
-  $("#query").hyperlink({
-            source:function(request, response) {
-                $.getJSON("{{url_for('hyperlink')}}",{
-                    q: request.term, // in flask, "q" will be the argument to look for using request.args
-                }, function(data) {
-                    response(data.matching_results); // matching_results from jsonify
-                });
-            },
-            minLength: 2,
-            select: function(event, ui) {
-                console.log(ui.item.value); // not in your question, but might help later
-            }
-        });
-  $('tbody tr th').each(function(){
-    $(this).html('<a href="#">' + $(this).html() + '</a>')
+  $('tbody tr th').hover(function(){
+    //source:function(request, response) {
+    	$.getJSON("{{url_for('hyperlink')}}", 
+
+    },
+    function(){
+
+    }
+    //select: function.log(ui.item.value);
+
+
+    //$(this).html('<a href="' + ">' + $(this).html() + '</a>')
   });
 });
+</script>-->
+
+
+<style>
+    #cy {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 10%;
+        left: 0%;
+    }
+    #table {
+        position: absolute;
+        left:10%;
+        top:100%;
+    }
+</style>
+
+<div id="cy"></div>
+    <script>
+        window.alert('1')
+        var tab = document.getElementById('cy')
+        var cy = cytoscape({
+            container: document.getElementById('cy'),
+            
+            style: [
+                
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 0.5,
+                        'line-color': '#ad1a66'
+                    }
+                }
+            ],
+        elements: [
+            ]
+        });
+        
+        var nodes = '{{ nodes|tojson }}'
+        var edges1 = '{{ edges1|tojson }}'
+        var edges2 = '{{ edges2|tojson }}'
+        for (var i = 0; i < nodes.length; i++) {
+            cy.add([
+                { group: "nodes", data: { id: nodes[i] } }
+            ]);
+        }
+        for (var i = 0; i < edges1.length; i++) {
+            if (edges1[i] != edges2[i]) {
+                cy.add([
+                    {
+                        group: "edges",
+                        data: {
+                            id: edges1[i] + edges2[i],
+                            source: edges1[i],
+                            target: edges2[i]
+                        }
+                    }
+                ]);
+            }
+        }
+        
+        var options = {
+        };
+        cy.layout(options);
+        var layout = cy.layout({ name: 'concentric' });
+        layout.run();
 </script>
+
 
 <div id='result' class='container'>
          

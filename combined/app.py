@@ -48,7 +48,7 @@ def allowed_file(filename):
 # upload page
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info']
+    type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info', 'links']
     if request.method == 'POST':
         try:
             if request.form['button'] == 'file':  
@@ -58,7 +58,7 @@ def upload_file():
                     filename = secure_filename(file.filename)
                     saveLocation = app.config['UPLOAD_FOLDER'] + filename
                     file.save(saveLocation)
-                    if evidence_name == 'info':
+                    if evidence_name == 'info' or evidence_name == 'links':
                         df1 = pd.read_csv(saveLocation)
                         engine1 = create_engine('mysql://root:binf3111@localhost', echo=True)
                         engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
@@ -112,9 +112,12 @@ def upload_file():
                             print '3check'
                             dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
                             print '4check'
-                return render_template('upload_success.html')
+                    return render_template('upload_success.html')
+                else: 
+                    return render_template('error.html', error = e)
             elif request.form['button'] == 'new_drug':
                 print 'pei!!!'
+
         except Exception as e:
             return render_template('error.html', error = e)
 
@@ -203,9 +206,63 @@ def result(query,evidence, threshold):
         
         conn.close()
         
+        #network result
+
+        #args2 = (evidence[0])
+        #cursor.callproc('fullNetwork', args)
+        #data=cursor.fetchall()
+        #num_fields = len(cursor.description)
+        #field_names = [i[0] for i in cursor.description]
+        #field_names[1] = 'Name'
+        #networkdf = pd.DataFrame(list(data), columns = field_names)
+        #networkdf2 = networkdf
+    #networkdf.set_index(['Name'],inplace = True)
+    #networkdf.index.name = 'Name'
+        #networkdf1 = networkdf.iloc[:, 1:num_fields]
+        #networkjson = networkdf1.to_json()
+    #print(json.dumps(networkjson))
+        nodes= []
+        #nodes= field_names[2:]
+        edges1= []
+        edges2= []
+        fullnetwork= []
+        drugs= []
+        trueedges1= []
+        trueedges2= []
+        drugs.append(query)
+
+        for row in datadf.itertuples(index = True, name = 'Pandas'):
+            drugs.append(getattr(row, 'Index'))
+        print(drugs)
+
+        for row in datadf.itertuples(index=True, name='Pandas'):
+            edges1.append(query)
+            edges2.append(getattr(row, 'Index'))
+         #   for i in field_names[2:]:
+        #        if (getattr(row, i)) > 0.9:
+        #            edges1.append(getattr(row, field_names[1]))
+        #            edges2.append(i)
+                #print (getattr(row, i))
+                #print (i)
+                #print (getattr(row, field_names[1]))
+        print edges1
+        print edges2
+    #print(nodes)
+    #print(edges1)
+    #print(edges2)
+        #print(drugs)
+        #for edge in range(len(edges1)):
+        #    print(edges1[edge])
+        #    if edges1[edge] in drugs:
+        #        if edges2[edge] in drugs:
+        #            trueedges1.append(edges1[edge])
+        #            trueedges2.append(edges2[edge])
+        #            print(edges1[edge])
+        #            print(edges2[edge])
+
         if len(data) >0:
         # no url change now
-            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles)
+            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles, nodes=drugs, edges1=edges1, edges2=edges2)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
@@ -256,7 +313,8 @@ def hyperlink():
     search = request.args.get('q')
     conn = mysql.connect()
     cursor = conn.cursor()
-    sql=("select CONCAT(ID, ' ', `GENERIC NAME`) from  info where ID like '%"+search+"%' or `GENERIC NAME` like '%"+search+"%'")
+    sql=("select CONCAT('\tDrugBank: ', IFNULL(links.DrugBank, ''), '\n\tKEGG: ', IFNULL(links.KEGG, ''), '\n\tPubChem: ', IFNULL(links.PubChem, ''), '\n\tDrugs.com: ', IFNULL(links.`Drugs.com`,'')) as hyperlink from  links, info where links.`GENERIC NAME` = info.`GENERIC NAME` and ID='" + search + "'")
+
     cursor.execute(sql)
     symbols = cursor.fetchall()
     results = [mv[0] for mv in symbols]
