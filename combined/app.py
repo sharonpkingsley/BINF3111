@@ -14,7 +14,7 @@ app._static_folder = "/static"
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'binf3111'
+app.config['MYSQL_DATABASE_PASSWORD'] = 'Sharon0108'
 app.config['MYSQL_DATABASE_DB'] = 'drugdb'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
@@ -55,7 +55,7 @@ def upload_file():
             #return redirect(url_for('read_uploaded_file',
             #                        filename=filename))
                     df1 = pd.read_csv(saveLocation)
-                    engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
+                    engine = create_engine('mysql://root:Sharon0108@localhost/drugdb', echo=True)
                     df1.to_sql(evidence_name, con=engine, if_exists='replace')
                     return render_template('upload_success.html')
         except Exception as e:
@@ -101,21 +101,76 @@ def result(query,evidence):
     args = (query, evidence)
     cursor.callproc('searchOneEvidence', args)
     data = cursor.fetchall()
+
     conn.close()
 
-    print data
-    print type(data)
+    #print (data)
+    #print type(data)
     datadf = pd.DataFrame(list(data), columns=['Name', 'Score'])
+    jsonf = datadf.to_json()
+    #print(json.dumps(jsonf))
     datadf.set_index(['Name'],inplace = True)
     datadf.index.name = None
-    print datadf
+    #print (datadf)
     data_table = datadf.to_html()
     titles = ['na']
     titles.append('Drugs with evidence '+ evidence)
 
+    cursor = mysql.connect().cursor()
+    #cursor.execute("SELECT * from drugdb.evidence_one")
+    args2 = (evidence)
+    cursor.callproc('fullNetwork', args)
+    data=cursor.fetchall()
+    num_fields = len(cursor.description)
+    field_names = [i[0] for i in cursor.description]
+    field_names[1] = 'Name'
+    networkdf = pd.DataFrame(list(data), columns = field_names)
+    networkdf2 = networkdf
+    #networkdf.set_index(['Name'],inplace = True)
+    #networkdf.index.name = 'Name'
+    networkdf1 = networkdf.iloc[:, 1:num_fields]
+    networkjson = networkdf1.to_json()
+    #print(json.dumps(networkjson))
+    nodes= []
+    nodes= field_names[2:]
+    edges1= []
+    edges2= []
+    fullnetwork= []
+    drugs= []
+    trueedges1= []
+    trueedges2= []
+    drugs.append(query)
+
+    for row in datadf.itertuples(index = True, name = 'Pandas'):
+        drugs.append(getattr(row,'Index'))
+        #print(drugs)
+
+    for row in networkdf.itertuples(index=True, name='Pandas'):
+        for i in field_names[2:]:
+            if (getattr(row, i)) > 0.9:
+                edges1.append(getattr(row, field_names[1]))
+                edges2.append(i)
+                #print (getattr(row, i))
+                #print (i)
+                #print (getattr(row, field_names[1]))
+    
+    #print(nodes)
+    #print(edges1)
+    #print(edges2)
+    print(drugs)
+    for edge in range(len(edges1)):
+        print(edges1[edge])
+        if edges1[edge] in drugs:
+            if edges2[edge] in drugs:
+                trueedges1.append(edges1[edge])
+                trueedges2.append(edges2[edge])
+                print(edges1[edge])
+                print(edges2[edge])
+
+
     if len(data) >0:
     # no url change now
-        return render_template('result.html',tables=[datadf.to_html(classes='male')], titles = titles)
+        return render_template('result.html',tables=[datadf.to_html(classes='male')], titles = titles, nodes=drugs, edges1=trueedges1, edges2=trueedges2)
     else:
         return render_template('error.html', error = 'No result!')
     
