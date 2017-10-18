@@ -259,6 +259,8 @@ begin
 
     if @total_amount = 1 then
         set @firt_column = 'all_drug_name';
+        set @average = 'average';
+        #select @firt_column;
         if evi1 <> '' then
             set @evidence_name = evi1;
             set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,'))/1  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
