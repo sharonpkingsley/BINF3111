@@ -40,3 +40,14 @@ end $$
 DELIMITER ;
 
 
+DROP PROCEDURE IF EXISTS fullNetwork;
+DELIMITER $$
+CREATE PROCEDURE fullNetwork(IN drugName VARCHAR(255), IN evidenceName VARCHAR(255))
+BEGIN
+  SET @t1 =CONCAT('SELECT * FROM ',evidenceName);
+  PREPARE result FROM @t1;
+  EXECUTE result;
+  DEALLOCATE PREPARE result;
+END$$
+DELIMITER ;
+
