@@ -128,14 +128,13 @@ def upload_file():
                         engine1 = create_engine('mysql://root:binf3111@localhost', echo=True)
                         engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
                         engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
-                        df1.to_sql(evidence_name, con=engine, if_exists='replace')
+                        df1.to_sql(drugid, con=engine, if_exists='replace')
                     else: 
                         return render_template('error.html', error = e)  
 
                     #insert into tables
                     conn = mysql.connect()
                     cursor = conn.cursor()
-                    args = (druga[0], drugb[0], evidence_name, score)
                     args = (drugid, drugname, evidence_name)
                     cursor.callproc('newDrugAddition', args)
                     conn.commit()
@@ -372,33 +371,9 @@ def hyperlink():
     return jsonify(matching_results=results)
 
 
-#export the data
-@app.route('/export', methods=['GET','POST'])   
-def export():
-    if request.method == 'POST':
-        #if request.form['submit'] == 'Get Data':
-            drug_input_name = request.form['drug']
-            evidence_input_name = get_evis()
-            print drug_input_name
-            print evidence_input_name
-
-            conn = mysql.connect()
-            cursor = conn.cursor()
-            si = StringIO.StringIO()
-            cw = csv.writer(si)
-
-            args = (drug_input_name, evidence_input_name)
-            cursor.callproc('searchOneEvidence', args)
-            data = cursor.fetchall()
-
-            cw.writerow([i[0] for i in cursor.description])
-            cw.writerows(data)
-            response = make_response(si.getvalue())
-            response.headers['Content-Disposition'] = 'attachment; filename=report.csv'
-            response.headers["Content-type"] = "text/csv"
-            conn.close()
-            return response
-           
+@app.route('/help', methods=['GET'])
+def help():
+    return render_template('help.html')         
 
 
 @app.route('/signUp',methods=['POST','GET'])
