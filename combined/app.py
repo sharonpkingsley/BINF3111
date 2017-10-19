@@ -104,19 +104,65 @@ def upload_file():
                             os.system('chmod +x cutFile.sh')
                             subprocess.call(['./cutFile.sh', columnRange, str(saveLocation), output_file])
                             dff = pd.read_csv(output_file)
-                            print 'yoki'
                             engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
-                            print 'joki'
                             evidenceTable = str(evidence_name) + str(j)
                             evidenceTableName = evidenceTable.replace(" ", "")
-                            print '3check'
                             dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
-                            print '4check'
-                    return render_template('upload_success.html')
+                    return render_template('upload_success.html', message='Upload success')
                 else: 
                     return render_template('error.html', error = e)
             elif request.form['button'] == 'new_drug':
-                print 'pei!!!'
+                    print 'new_drug'
+                    drugid = request.form['drugid']
+                    drugname = request.form['drugname']
+                    file = request.files['filenew']
+                    evidence_name = request.form['option-new']
+                    
+                    #upload file to database 
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        saveLocation = app.config['UPLOAD_FOLDER'] + filename
+                        file.save(saveLocation)
+                        
+                        df1 = pd.read_csv(saveLocation)
+                        engine1 = create_engine('mysql://root:binf3111@localhost', echo=True)
+                        engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
+                        engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
+                        df1.to_sql(evidence_name, con=engine, if_exists='replace')
+                    else: 
+                        return render_template('error.html', error = e)  
+
+                    #insert into tables
+                    conn = mysql.connect()
+                    cursor = conn.cursor()
+                    args = (druga[0], drugb[0], evidence_name, score)
+                    args = (drugid, drugname, evidence_name)
+                    cursor.callproc('newDrugAddition', args)
+                    conn.commit()
+                    conn.close()
+
+                    return render_template('upload_success.html', message='New drug addtion success')
+            elif request.form['button'] == 'update_drug':
+                print 'edit'
+                druga = request.form['druga']
+                drugb = request.form['drugb']
+                score = request.form['score']
+                evidence_name = request.form['option-edit']
+                druga = druga.split(' ')
+                drugb = drugb.split(' ')
+                
+                #database connection
+                conn = mysql.connect()
+                cursor = conn.cursor()
+                args = (druga[0], drugb[0], evidence_name, score)
+                cursor.callproc('changeDrugRecord', args)
+                conn.commit()
+                conn.close()
+
+                return render_template('upload_success.html', message='Score change success')
+            else:
+                print 'else'
+                return render_template('upload_success.html', message='Unknown operation')
 
         except Exception as e:
             return render_template('error.html', error = e)

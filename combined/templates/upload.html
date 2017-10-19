@@ -49,12 +49,12 @@
       	
       	<p>New Drug ID: <input type=text class='form-control' name=drugid></p>
       	<p>New Drug Name: <input type=text class='form-control' name=drugname></p>
-      	<p>New Drug File: <input type=file name=file></p>
+      	<p>New Drug File: <input type=file name=filenew></p>
 
     	<table>
           <td>
           <label>Evidence type: </label>
-      	    <select name="option" width="300px">
+      	    <select name="option-new" width="300px">
             {% for x in evidence_list %}
 			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
 			{% endfor %}</select>
@@ -78,7 +78,7 @@
     	<table>
           <td>
           <label>Evidence type: </label>
-      	    <select name="option" width="300px">
+      	    <select name="option-edit" width="300px">
             {% for x in evidence_list %}
 			<option value="{{ x }}"{% if loop.first %} SELECTED{% endif %}>{{ x }}</option>
 			{% endfor %}</select>
@@ -92,4 +92,6 @@
     </form>
 
   </div>
+
+
 {% endblock %}

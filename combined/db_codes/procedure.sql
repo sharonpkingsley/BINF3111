@@ -221,7 +221,6 @@ call searchMaxThreeSelectedEvidence('ANWABDrug','evidence1','evidence2','evidenc
 
 
 #search with selected multiple evidences with one drug name as parameters
-#search with selected multiple evidences with one drug name as parameters
 drop procedure if exists searchMaxThreeSelectedEvidence;
 DELIMITER $$
 create procedure searchMaxThreeSelectedEvidence(IN drugName VARCHAR(255), IN evi1 VARCHAR(255), IN evi2 VARCHAR(255),IN evi3 VARCHAR(255),IN threshold float)
@@ -479,6 +478,8 @@ begin
 
     if @total_amount = 1 then
         set @firt_column = 'all_drug_name';
+        set @average = 'average';
+        #select @firt_column;
         if evi1 <> '' then
             set @evidence_name = evi1;
             set @updateTable = concat('update ', @tempTable, ' f inner join (select ', @firt_column,', (sum(', evi1 ,'))/1  as average from ', @tempTable,' group by ', @firt_column,' ) a on f.all_drug_name = a.all_drug_name set f.', @tempTableName, ' = a.',@average);
@@ -559,7 +560,7 @@ select CONCAT("\tDrugBank: ", IFNULL(links.DrugBank, ''), "\n\tKEGG: ", IFNULL(l
 
 
 
-
+#=======network=========
 DROP PROCEDURE IF EXISTS fullNetwork;
 DELIMITER $$
 CREATE PROCEDURE fullNetwork(IN drugName VARCHAR(255), IN evidenceName VARCHAR(255))
