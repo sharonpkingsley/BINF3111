@@ -368,7 +368,7 @@ begin
         #select * from final_result where Score > threshold and all_drug_ID <> drugName and evi1 <> 0 and evi2 <> 0 and evi3 <> 0;
     end if;
 
-    select * from final_result where Score > threshold and all_drug_ID <> drugName and Score <> 0 and all_drug_ID = 'DB00035';
+    select * from final_result where Score > threshold and all_drug_ID <> drugName and Score <> 0;
     drop table final_result;
 
 end$$ 
