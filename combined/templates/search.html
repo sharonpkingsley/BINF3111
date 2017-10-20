@@ -40,18 +40,8 @@
             {% for error in form.query.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}<br>
-            <!--|{% for pr in providers %}-->
-            <!--    <a href="javascript:set_openid('{{ pr.url }}', '{{ pr.name }}');">{{ pr.name }}</a> |
-            {% endfor %}-->
         </p>
     </div>
-        <!--<p> 
-            Please select your evidence type below:<br>
-            {{ form.evidence(size=80) }}
-            {% for error in form.query.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}<br>-->
-        <!-- Filter options -->
             <div class='panel-group'>
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -64,8 +54,8 @@
                         <li class="list-group-item">Evidence Types: 
                             <label class="checkbox-inline">{{ form.checkall }}All</label>
                             <label class="checkbox-inline">{{ form.target }}Target</label>
-                            <label class="checkbox-inline">{{ form.struct }}Struct</label>
-                            <lable class="checkbox-inline">{{ form.chem }}Chem</label>
+                            <label class="checkbox-inline">{{ form.pathway }}Pathway</label>
+                            <lable class="checkbox-inline">{{ form.chemical_structure }}Chemical Structure</label>
                         <li class="list-group-item">Threshold: {{ form.threshold }}</li>  
                     </ul>
                 <div class="panel-footer">Footer</div>

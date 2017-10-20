@@ -38,7 +38,7 @@ app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 
 #evidence list
-evi_list = ['chemical_structure', 'pathway', 'target']
+evi_list = ['target', 'pathway', 'chemical_structure']
 
 # file format check ########TO DO#######
 def allowed_file(filename):
@@ -75,6 +75,7 @@ def upload_file():
                         #minus the first column, which is the name column
                         print total_num_of_columns
                         
+                        # divide columns
                         x = 2
                         startX = 2 #always
                         print total_num_of_columns
@@ -93,10 +94,9 @@ def upload_file():
                             resultIn = output.replace(" ","")
                             colRangeAll.append(resultIn)
                             num_of_tables += 1
-                        #start from 0..14
                         print colRangeAll
 
-
+                        # read files
                         for j in range(0,num_of_tables):
                             columnRange = "1,"+colRangeAll[j]
                             file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
@@ -108,7 +108,8 @@ def upload_file():
                             evidenceTable = str(evidence_name) + str(j)
                             evidenceTableName = evidenceTable.replace(" ", "")
                             dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
-                    return render_template('upload_success.html', message='Upload success')
+                    os.system('rm uploads/*')
+                    message='Upload success'
                 else: 
                     return render_template('error.html', error = e)
             elif request.form['button'] == 'new_drug':
@@ -139,8 +140,7 @@ def upload_file():
                     cursor.callproc('newDrugAddition', args)
                     conn.commit()
                     conn.close()
-
-                    return render_template('upload_success.html', message='New drug addtion success')
+                    message='New drug addtion success'
             elif request.form['button'] == 'update_drug':
                 print 'edit'
                 druga = request.form['druga']
@@ -157,12 +157,11 @@ def upload_file():
                 cursor.callproc('changeDrugRecord', args)
                 conn.commit()
                 conn.close()
-
-                return render_template('upload_success.html', message='Score change success')
+                message='Score change success'     
             else:
                 print 'else'
-                return render_template('upload_success.html', message='Unknown operation')
-
+                message='Unknown operation'
+            return render_template('upload_success.html', message=message)
         except Exception as e:
             return render_template('error.html', error = e)
 

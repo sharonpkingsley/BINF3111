@@ -10,9 +10,9 @@ class SearchForm(FlaskForm):
     query = StringField('keyword', validators=[DataRequired()], render_kw={"class": "form-control"})
     evidence = StringField('evidence', validators=[DataRequired()])
     checkall = BooleanField('all')
-    target = BooleanField('Target')
-    struct = BooleanField('Struct')
-    chem = BooleanField('Chem')
+    target = BooleanField('target')
+    pathway = BooleanField('pathway')
+    chemical_structure = BooleanField('chemical_structure')
     threshold = FloatField('threshold', default = 0, render_kw={"placeholder": "0"})
     
 #    evidences_list = [('evi1','evi1'), ('evi2','evi2'),('evi3','evi3')]
