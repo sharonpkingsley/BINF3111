@@ -7,10 +7,10 @@ begin
         WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'target%' and t.column_name = drugName;
     
     DECLARE cur2 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%' and t.column_name = drugName;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%' and t.column_name = drugName;
     
     DECLARE cur3 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%' and t.column_name = drugName;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%' and t.column_name = drugName;
 
     SET @tempTable = 'final_result';
     SET @droptable = CONCAT ('DROP TABLE IF EXISTS  ', @tempTable);
@@ -21,14 +21,15 @@ begin
     PREPARE createtb FROM @createtable ; 
     EXECUTE createtb;
     DEALLOCATE PREPARE createtb ;
-    insert into `final_result` select ID, `GENERIC NAME` from evia;
+    #evia -> info
+    insert into `final_result` select ID, `GENERIC NAME` from info;
 
     set @total_amount = 0;
     set @tempTableName = '';
 
     if evi1 <> '' then 
         set @total_amount = @total_amount +1;
-        if evi1 = 'Target' then
+        if evi1 = 'target' then
             set @tt = concat('alter table ', @tempTable, ' add column Target VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
@@ -54,8 +55,8 @@ begin
             close cur1; 
         end if;
 
-        if evi1 = 'Struct' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Struct VARCHAR(255)');
+        if evi1 = 'chemical_structure' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Chemical_structure VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;
@@ -66,13 +67,13 @@ begin
                 DECLARE table_name1 CHAR(255);
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 myloop: loop
-                    fetch cur2 into table_name1; #target0, target1....
+                    fetch cur2 into table_name1; 
                     if done then
                         leave myloop;
                     end if;
                     set @tempTableName = table_name1;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ',drugName,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ',drugName,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chemical_structure= a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -80,8 +81,8 @@ begin
             close cur2; 
         end if;
 
-        if evi1 = 'Chem' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Chem VARCHAR(255)');
+        if evi1 = 'pathway' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Pathway VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;
@@ -97,9 +98,9 @@ begin
                         leave myloop;
                     end if;
                     set @tempTableName = table_name2;
-                    select @tempTableName;
+                    #select @tempTableName;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Pathway= a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -117,7 +118,7 @@ begin
 
     if evi2 <> '' then 
         set @total_amount = @total_amount +1;
-        if evi2 = 'Target' then 
+        if evi2 = 'target' then 
             set @tt = concat('alter table ', @tempTable, ' add column Target VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
@@ -134,7 +135,7 @@ begin
                         leave myloop;
                     end if;
                     set @tempTableName = table_name;
-                    select @tempTableName;
+                    #select @tempTableName;
                 end loop;
                 set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Target= a.', drugName);
                 PREPARE re FROM @updateTable;
@@ -144,8 +145,8 @@ begin
             close cur1; 
         end if;
 
-        if evi2 = 'Struct' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Struct VARCHAR(255)');
+        if evi2 = 'chemical_structure' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Chemical_structure VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;            
@@ -155,14 +156,14 @@ begin
                 DECLARE table_name1 CHAR(255);
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 myloop: loop
-                    fetch cur2 into table_name1; #struct0, struct....
+                    fetch cur2 into table_name1;
                     if done then
                         leave myloop;
                     end if;
                     set @tempTableName = table_name1;
-                    select @tempTableName;
+                    #select @tempTableName;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chemical_structure = a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -171,8 +172,8 @@ begin
         
         end if;
 
-        if evi2 = 'Chem' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Chem VARCHAR(255)');
+        if evi2 = 'pathway' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Pathway VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;
@@ -188,9 +189,9 @@ begin
                         leave myloop;
                     end if;
                     set @tempTableName = table_name2;
-                    select @tempTableName;
+                    #select @tempTableName;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Pathway= a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -206,7 +207,7 @@ begin
 
     if evi3 <> '' then 
         set @total_amount = @total_amount +1;
-        if evi3 = 'Target' then 
+        if evi3 = 'target' then 
             set @tt = concat('alter table ', @tempTable, ' add column Target VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
@@ -232,8 +233,8 @@ begin
             close cur1; 
         end if;
 
-        if evi3 = 'Struct' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Struct VARCHAR(255)');
+        if evi3 = 'chemical_structure' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Chemical_structure VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;            
@@ -243,13 +244,13 @@ begin
                 DECLARE table_name1 CHAR(255);
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
                 myloop: loop
-                    fetch cur2 into table_name1; #struct0, struct....
+                    fetch cur2 into table_name1; 
                     if done then
                         leave myloop;
                     end if;
-                set @tempTableName = table_name1;
+                    set @tempTableName = table_name1;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Struct= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chemical_structure= a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -258,8 +259,8 @@ begin
         
         end if;
 
-        if evi3 = 'Chem' then 
-            set @tt = concat('alter table ', @tempTable, ' add column Chem VARCHAR(255)');
+        if evi3 = 'pathway' then 
+            set @tt = concat('alter table ', @tempTable, ' add column Pathway VARCHAR(255)');
             PREPARE res FROM @tt;
             EXECUTE res;
             DEALLOCATE PREPARE res;
@@ -276,7 +277,7 @@ begin
                     end if;
                     set @tempTableName = table_name2;
                 end loop;
-                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Chem= a.', drugName);
+                set @updateTable = concat('update ', @tempTable, ' f inner join ( select DRUGBANK_ID, round(', drugName, ',3)as ', drugName ,' from ', @tempTableName, ' )a on f.all_drug_ID = a.DRUGBANK_ID set f.Pathway= a.', drugName);
                 PREPARE re FROM @updateTable;
                 EXECUTE re;
                 DEALLOCATE PREPARE re;
@@ -373,6 +374,6 @@ begin
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('DB00014','Chem','Struct','Target',0.01);
+call searchMaxThreeSelectedEvidence('DB00014','','','target',0.01);
 
 
