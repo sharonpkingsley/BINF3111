@@ -87,17 +87,50 @@ def upload_file():
 					#start from 0..14
 					print colRangeAll
 
+					print "evidence evidence", evidence_name
+					if evidence_name == "target":
+						os.system('chmod +x deleteTarget.sh')
+						subprocess.call(['./deleteTarget.sh'])
+						for j in range(0,15):
+							columnRange = "1,"+colRangeAll[j]
+							file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
+							output_file = file_name.replace(" ", "")
+							os.system('chmod +x cutFile.sh')
+							subprocess.call(['./cutFile.sh', columnRange, str(filename), output_file])
+							dff = pd.read_csv(output_file)
+							engine = create_engine('mysql://root:1234@localhost/drugdb', echo=True)
+							evidenceTable = str(evidence_name) + str(j)
+							evidenceTableName = evidenceTable.replace(" ", "")
+							dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
 
-					for j in range(0,15):
-						columnRange = "1,"+colRangeAll[j]
-						file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
-						output_file = file_name.replace(" ", "")
-						subprocess.call(['./cutFile.sh', columnRange, str(filename), output_file])
-						dff = pd.read_csv(output_file)
-						engine = create_engine('mysql://root:1234@localhost/drugdb', echo=True)
-						evidenceTable = str(evidence_name) + str(j)
-						evidenceTableName = evidenceTable.replace(" ", "")
-						dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
+					elif evidence_name == "chemical_structure":
+						os.system('chmod +x deleteChemical.sh')
+						subprocess.call(['./deleteChemical.sh'])
+						for j in range(0,15):
+							columnRange = "1,"+colRangeAll[j]
+							file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
+							output_file = file_name.replace(" ", "")
+							os.system('chmod +x cutFile.sh')
+							subprocess.call(['./cutFile.sh', columnRange, str(filename), output_file])
+							dff = pd.read_csv(output_file)
+							engine = create_engine('mysql://root:1234@localhost/drugdb', echo=True)
+							evidenceTable = str(evidence_name) + str(j)
+							evidenceTableName = evidenceTable.replace(" ", "")
+							dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
+					elif evidence_name == "pathway":
+						os.system('chmod +x deletePathway.sh')
+						subprocess.call(['./deletePathway.sh'])
+						for j in range(0,15):
+							columnRange = "1,"+colRangeAll[j]
+							file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
+							output_file = file_name.replace(" ", "")
+							os.system('chmod +x cutFile.sh')
+							subprocess.call(['./cutFile.sh', columnRange, str(filename), output_file])
+							dff = pd.read_csv(output_file)
+							engine = create_engine('mysql://root:1234@localhost/drugdb', echo=True)
+							evidenceTable = str(evidence_name) + str(j)
+							evidenceTableName = evidenceTable.replace(" ", "")
+							dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
 
 				#chunk.to_sql(evidence_name, con=engine, if_exists='append')
 			#engine1 = create_engine('mysql://root:1234@localhost', echo=True)
