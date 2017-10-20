@@ -13,18 +13,18 @@ begin
         WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'target%' and t.COLUMN_NAME = drugID_B;
     
     DECLARE cur2_1 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%' and t.COLUMN_NAME = drugID_A;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%' and t.COLUMN_NAME = drugID_A;
     DECLARE cur2_2 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%' and t.COLUMN_NAME = drugID_B;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%' and t.COLUMN_NAME = drugID_B;
     
     DECLARE cur3_1 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%' and t.COLUMN_NAME = drugID_A;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%' and t.COLUMN_NAME = drugID_A;
     DECLARE cur3_2 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%' and t.COLUMN_NAME = drugID_B;
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%' and t.COLUMN_NAME = drugID_B;
     
 
     #new drug input --> drugID as the table name
-    if evi1 = 'Target' then 
+    if evi1 = 'target' then 
         #change for first drug column
         open cur1_1;
         begin
@@ -77,7 +77,7 @@ begin
     end if;
 
 
-    if evi1 = 'Struct' then 
+    if evi1 = 'chemical_structure' then 
         #change for first drug column
         open cur2_1;
         begin
@@ -129,7 +129,7 @@ begin
         DEALLOCATE PREPARE re;
     end if;
 
-    if evi1 = 'Chem' then 
+    if evi1 = 'pathway' then 
         #change for first drug column
         open cur3_1;
         begin
@@ -184,5 +184,6 @@ begin
 
 end$$ 
 DELIMITER ;
+
 call changeDrugRecord('DB30000','DB00014','Struct',0.04);
 

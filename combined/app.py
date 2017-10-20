@@ -40,7 +40,7 @@ app.config['SECRET_KEY'] = 'you-will-never-guess'
 #evidence list
 evi_list = ['target', 'pathway', 'chemical_structure']
 
-# file format check ########TO DO#######
+# file format check 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
@@ -48,21 +48,23 @@ def allowed_file(filename):
 # upload page
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info', 'links']
+    type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info']
     if request.method == 'POST':
         try:
+            engine1 = create_engine('mysql://' + app.config['MYSQL_DATABASE_USER'] + ':' + app.config['MYSQL_DATABASE_PASSWORD'] + '@' + app.config['MYSQL_DATABASE_HOST'], echo=True)
+            engine1.execute("CREATE DATABASE IF NOT EXISTS " + app.config['MYSQL_DATABASE_DB'])
+            engine = create_engine('mysql://' + app.config['MYSQL_DATABASE_USER'] + ':' + app.config['MYSQL_DATABASE_PASSWORD'] + '@' + app.config['MYSQL_DATABASE_HOST'] + '/' + app.config['MYSQL_DATABASE_DB'], echo=True)
+                
             if request.form['button'] == 'file':  
                 file = request.files['file']
                 evidence_name = request.form['option']
+                            
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     saveLocation = app.config['UPLOAD_FOLDER'] + filename
                     file.save(saveLocation)
                     if evidence_name == 'info' or evidence_name == 'links':
                         df1 = pd.read_csv(saveLocation)
-                        engine1 = create_engine('mysql://root:binf3111@localhost', echo=True)
-                        engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
-                        engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
                         df1.to_sql(evidence_name, con=engine, if_exists='replace')
 
                     else:
@@ -96,6 +98,13 @@ def upload_file():
                             num_of_tables += 1
                         print colRangeAll
 
+                        # drop all existing related tables
+                        conn = mysql.connect()
+                        cursor = conn.cursor()
+                        args = (evidence_name,)
+                        cursor.callproc('deleteTables', args)
+                        conn.close()
+
                         # read files
                         for j in range(0,num_of_tables):
                             columnRange = "1,"+colRangeAll[j]
@@ -104,11 +113,9 @@ def upload_file():
                             os.system('chmod +x cutFile.sh')
                             subprocess.call(['./cutFile.sh', columnRange, str(saveLocation), output_file])
                             dff = pd.read_csv(output_file)
-                            engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
                             evidenceTable = str(evidence_name) + str(j)
                             evidenceTableName = evidenceTable.replace(" ", "")
                             dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
-                    os.system('rm uploads/*')
                     message='Upload success'
                 else: 
                     return render_template('error.html', error = e)
@@ -126,9 +133,6 @@ def upload_file():
                         file.save(saveLocation)
                         
                         df1 = pd.read_csv(saveLocation)
-                        engine1 = create_engine('mysql://root:binf3111@localhost', echo=True)
-                        engine1.execute("CREATE DATABASE IF NOT EXISTS drugdb")
-                        engine = create_engine('mysql://root:binf3111@localhost/drugdb', echo=True)
                         df1.to_sql(drugid, con=engine, if_exists='replace')
                     else: 
                         return render_template('error.html', error = e)  
@@ -161,6 +165,7 @@ def upload_file():
             else:
                 print 'else'
                 message='Unknown operation'
+            os.system('rm uploads/*')
             return render_template('upload_success.html', message=message)
         except Exception as e:
             return render_template('error.html', error = e)
@@ -211,6 +216,7 @@ def search():
 # result page
 @app.route('/result/<query>/<evidence>/<threshold>', methods=['GET','POST'])
 def result(query,evidence, threshold):
+  try:
     # format unicode into string - correct format to input into database
     formatted_evidence = str(evidence).replace("[",'')
     formatted_evidence = formatted_evidence.replace(']','')
@@ -294,7 +300,8 @@ def result(query,evidence, threshold):
             response.headers["Content-type"] = "text/csv"
             conn.close()
             return response
-        
+  except Exception as e:
+        return render_template('error.html', error=e)  
 
 # network view
 @app.route('/cytoscape1.js')
