@@ -38,7 +38,7 @@ app.config['CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'you-will-never-guess'
 
 #evidence list
-evi_list = ['target', 'struct', 'chem']
+evi_list = ['chemical_structure', 'pathway', 'target']
 
 # file format check ########TO DO#######
 def allowed_file(filename):
@@ -225,7 +225,7 @@ def result(query,evidence, threshold):
     print evidences
     
     if request.method == 'GET':
-        # DATA RETRIEVATION
+        ## table result ##
         conn = mysql.connect()
         cursor = conn.cursor()
         titles = ['na']
@@ -242,7 +242,6 @@ def result(query,evidence, threshold):
         columns.append('Score')
         print columns
 
-
         datadf = pd.DataFrame(list(data), columns = columns)
         datadf.set_index(['ID'], inplace= True)
         datadf.index.name = None
@@ -251,23 +250,9 @@ def result(query,evidence, threshold):
         
         conn.close()
         
-        #network result
+        ##network result##
 
-        #args2 = (evidence[0])
-        #cursor.callproc('fullNetwork', args)
-        #data=cursor.fetchall()
-        #num_fields = len(cursor.description)
-        #field_names = [i[0] for i in cursor.description]
-        #field_names[1] = 'Name'
-        #networkdf = pd.DataFrame(list(data), columns = field_names)
-        #networkdf2 = networkdf
-    #networkdf.set_index(['Name'],inplace = True)
-    #networkdf.index.name = 'Name'
-        #networkdf1 = networkdf.iloc[:, 1:num_fields]
-        #networkjson = networkdf1.to_json()
-    #print(json.dumps(networkjson))
         nodes= []
-        #nodes= field_names[2:]
         edges1= []
         edges2= []
         fullnetwork= []
@@ -283,28 +268,9 @@ def result(query,evidence, threshold):
         for row in datadf.itertuples(index=True, name='Pandas'):
             edges1.append(query)
             edges2.append(getattr(row, 'Index'))
-         #   for i in field_names[2:]:
-        #        if (getattr(row, i)) > 0.9:
-        #            edges1.append(getattr(row, field_names[1]))
-        #            edges2.append(i)
-                #print (getattr(row, i))
-                #print (i)
-                #print (getattr(row, field_names[1]))
         print edges1
         print edges2
-    #print(nodes)
-    #print(edges1)
-    #print(edges2)
-        #print(drugs)
-        #for edge in range(len(edges1)):
-        #    print(edges1[edge])
-        #    if edges1[edge] in drugs:
-        #        if edges2[edge] in drugs:
-        #            trueedges1.append(edges1[edge])
-        #            trueedges2.append(edges2[edge])
-        #            print(edges1[edge])
-        #            print(edges2[edge])
-
+    
         if len(data) >0:
         # no url change now
             return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles, nodes=drugs, edges1=edges1, edges2=edges2)
@@ -331,10 +297,12 @@ def result(query,evidence, threshold):
             return response
         
 
+# network view
 @app.route('/cytoscape1.js')
 def script():
     return render_template('cytoscape1.js')    
 
+# autocomplete in search bar
 @app.route('/autocomplete',methods=['GET'])
 def autocomplete():
 
@@ -352,6 +320,7 @@ def autocomplete():
 
     return jsonify(matching_results=results)
 
+
 @app.route('/hyperlink',methods=['GET'])
 def hyperlink():
 
@@ -367,7 +336,6 @@ def hyperlink():
     cursor.close()
     conn.close()
 
-
     return jsonify(matching_results=results)
 
 
@@ -375,46 +343,6 @@ def hyperlink():
 def help():
     return render_template('help.html')         
 
-
-@app.route('/signUp',methods=['POST','GET'])
-def signUp():
-    try:
-        _ = request.form['search']
-        _email = request.form['inputEmail']
-        _password = request.form['inputPassword']
-
-        # validate the received values
-        if _name and _email and _password:
-            
-            # All Good, let's call MySQL
-            
-            cursor = mysql.connect().cursor()
-            cursor.execute("SELECT * from drugdb.2")
-            return jsonify(data=cursor.fetchall())           
-
-            #cursor.execute("SELECT * from 1;")
-            #data = cursor.fetchall()
-            return data
-            
-            for row in data:
-                print(row)
-            #_hashed_password = generate_password_hash(_password)
-            #cursor.callproc('sp_createUser',(_name,_email,_hashed_password))
-            #data = cursor.fetchall()
-
-            #if len(data) is 0:
-            #    conn.commit()
-             #   return json.dumps({'message':'User created successfully !'})
-            #else:
-            #    return json.dumps({'error':str(data[0])})
-        #else:
-         #   return json.dumps({'html':'<span>Enter the required fields</span>'})
-
-    except Exception as e:
-        return json.dumps({'error':str(e)})
-    finally:
-        cursor.close() 
-        conn.close()
 
 if __name__ == '__main__':
     app.run(debug=True)

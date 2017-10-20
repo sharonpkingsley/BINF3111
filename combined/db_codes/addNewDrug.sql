@@ -57,14 +57,6 @@ begin
                 #select @tempTable;
                 set @tempTableID = drugID; 
                 select @tempTableID;
-                ###################
-                ################### for testing to delete all teh added rows ####################
-                #set @deleteRow = concat('delete from ',@tempTable,' where DRUGBANK_ID = \'',@tempTableID,'\'');
-                #PREPARE re FROM @deleteRow;
-                #EXECUTE re;
-                #DEALLOCATE PREPARE re;
-                ##################################################################################
-                ##################################################################################
                 set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
                 select @insertFirstID;
                 PREPARE re FROM @insertFirstID;
@@ -260,15 +252,6 @@ begin
                 SET @tempTable = table_name3_1; 
                 #select @tempTable;
                 set @tempTableID = drugID; 
-                #select @tempTableID;
-                ###################
-                ################### for testing to delete all teh added rows ####################
-                #set @deleteRow = concat('delete from ',@tempTable,' where DRUGBANK_ID = \'',@tempTableID,'\'');
-                #PREPARE re FROM @deleteRow;
-                #EXECUTE re;
-                #DEALLOCATE PREPARE re;
-                ##################################################################################
-                ##################################################################################
                 set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
                 select @insertFirstID;
                 PREPARE re FROM @insertFirstID;
@@ -336,6 +319,11 @@ begin
         end;
         close cur3_2;
     end if;
+
+    set @dropInputTable = concat('drop table if exists ', drugID);
+    PREPARE re FROM @dropInputTable;
+    EXECUTE re;
+    DEALLOCATE PREPARE re;
 
 end$$ 
 DELIMITER ;
