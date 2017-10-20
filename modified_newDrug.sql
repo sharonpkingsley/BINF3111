@@ -15,26 +15,26 @@ begin
         WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'target%';
     
     DECLARE cur2 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%';
     DECLARE cur2_1 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%' and t.COLUMN_NAME = 'DRUGBANK_ID';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%' and t.COLUMN_NAME = 'DRUGBANK_ID';
     DECLARE cur2_2 cursor for SELECT t.TABLE_NAME, t.COLUMN_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'struct%';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chemical_structure%';
 
     DECLARE cur3 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%';
     DECLARE cur3_1 cursor for SELECT t.TABLE_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%' and t.COLUMN_NAME = 'DRUGBANK_ID';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%' and t.COLUMN_NAME = 'DRUGBANK_ID';
     DECLARE cur3_2 cursor for SELECT t.TABLE_NAME, t.COLUMN_NAME FROM information_schema.columns t
-        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'chem%';
+        WHERE t.table_schema='drugdb' and t.TABLE_NAME like 'pathway%';
 
 
     #new drug input --> drugID as the table name
-    if evi1 = 'Target' then 
+    if evi1 = 'target' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        if not exists(select ID from evia where ID = drugID) THEN 
-            set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
             select @row;
             PREPARE r FROM @row;
             EXECUTE r;
@@ -127,11 +127,11 @@ begin
         close cur1_2;
     end if;
 
-    if evi1 = 'Struct' then 
+    if evi1 = 'chemical_structure' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        if not exists(select ID from evia where ID = drugID) THEN 
-            set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
             select @row;
             PREPARE r FROM @row;
             EXECUTE r;
@@ -226,11 +226,11 @@ begin
         close cur2_2;
     end if;
 
-    if evi1 = 'Chem' then 
+    if evi1 = 'pathway' then 
         ####update the last row of the info dataset####
         #######  evia<---->info
-        if not exists(select ID from evia where ID = drugID) THEN 
-            set @row = concat('insert into evia (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
+        if not exists(select ID from info where ID = drugID) THEN 
+            set @row = concat('insert into info (ID, `GENERIC NAME`) values ( \'', drugID,  '\', \'', drugName,'\')');
             select @row;
             PREPARE r FROM @row;
             EXECUTE r;
