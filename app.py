@@ -98,6 +98,10 @@ def upload_file():
 
                         print "evidence evidence", evidence_name
                         if evidence_name == "target":
+                            conn = mysql.connect()
+                            cursor = conn.cursor()
+                            args = (evidence_name)
+                            cursor.callproc('deleteTables', args)
                             os.system('chmod +x deleteTarget.sh')
                             subprocess.call(['./deleteTarget.sh'])
                             for j in range(0,num_of_tables5):
@@ -113,6 +117,10 @@ def upload_file():
                                 dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
 
                         elif evidence_name == "struct":
+                            conn = mysql.connect()
+                            cursor = conn.cursor()
+                            args = (evidence_name)
+                            cursor.callproc('deleteTables', args)
                             os.system('chmod +x deleteStruct.sh')
                             subprocess.call(['./deleteStruct.sh'])
                             for j in range(0,num_of_tables):
@@ -127,6 +135,10 @@ def upload_file():
                                 evidenceTableName = evidenceTable.replace(" ", "")
                                 dff.to_sql(evidenceTableName, con=engine, if_exists='replace')
                         elif evidence_name == "chem":
+                            conn = mysql.connect()
+                            cursor = conn.cursor()
+                            args = (evidence_name)
+                            cursor.callproc('deleteTables', args)
                             os.system('chmod +x deleteChem.sh')
                             subprocess.call(['./deleteChem.sh'])
                             for j in range(0,num_of_tables):
