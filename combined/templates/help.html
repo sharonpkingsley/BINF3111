@@ -2,6 +2,101 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Oops</h1>
-      <h2>{{error}}</h2>
+    <h1 align=center>HELP</h1>
+    <div class='container'>  
+      <h2>1.Upload Page</h2>
+      <br>
+      <p><h3>1.1Update database</h3>
+      <br>
+      <p><h4>1.1.1 File format</h4>
+      The evidence file should be in csv format. The content should be in the form of a p*p matrix where entry(i,j) is the similarity score between drug i and drug j. Drugbank IDs are used to represent drugs in title columns and rows. 'DRUGBANK_ID' should be labelled in the entry(0,0).
+      <br><br>
+      The info file should be in csv format. The info file contains a reference sheet for DRUGBANK_ID and GENERIC_NAME. There should be two columns in the file. The first column lists DRUGBANK_IDs, whereas the second column lists the corresponding GENERIC_NAMEs.
+  	</p>
+  	<br>
+  	<p><h4>1.1.2 File type </h4>
+  		Click on the dropdown list and choose the database you want to update. target, pathway and chemical_structure are three different evidence types. info is the file which gives the generic names according to the drugbank_ids which drugs are represented as in the evidence files.
+  	</p>
+  	<br>
+  	<p><h3>1.2 Add a new drug</h3>
+  		<br>
+  		<p><h4>1.2.1 New drug name and ID</h4>
+  			Enter new drug ID in the 'New Drug ID' textbox. Example: DB30000.
+  			Enter new drug name in the 'New Drug Name' textbox. Example: Goserelin.
+  			Both textboxes have autosuggestion that reminds you what IDs/names already exist in the database. Please make sure no duplicates are added to the database.
+  		</p>
+  		<br>
+  		<p><h4>1.2.2 New drug file</h4>
+  			The new drug file should consist of two columns: drugbank_ID and score. The first column should have all drugbank_IDs in the database plus itself. The second colomn should have the similarity score to the corresponding drug.
+  		</p>
+  		<br>
+  		<p><h4>1.2.3 Evidence type</h4>
+  			Choose the evidence type the score is in the dropdown list.
+  		</p>
+  		<br>
+  	</p>
+  	<p><h3>1.3 Edit a drug record</h3>
+  		<br>
+  		<p><h4>1.3.1 Drug A/B name</h4>
+  		Enter the name/ID of the drugs of which the similarity score you want to change in Drug A/Drug B name textboxes. Both textboxes have autocomplete function. Choose one of the 'ID Name' from the dropdown list.
+  		</p>
+  		<br>
+  		<p><h4>1.3.2 Score</h4>
+  			Enter the new similarity score into the textbox. Only score from 0-1 is allowed. You can use the (?adjuster) on the right to change score in a step of 0.01.
+  		</p>
+  		<br>
+  		<p><h4>1.3.3 Evidence type</h4>
+  			Choose the evidence type the similarity score is in the dropdown list.
+  		</p>
+  		<br>
+  	</p>
+  	<br>
+  </p>
+
+  <h2>2. Search Page</h2>
+  	<br>
+  	<p><h3>2.1 Drug Name</h3>
+  		Enter the name/ID of the drug of which the similarity score you want to search in Drug name textbox. Choose one of the 'ID Name' from the autocomplete dropdown list.
+  	</p>
+  	<br>
+  	<p><h3>2.2 Filter Options</h3>
+  		<br>
+  		Click on Filter Options to discose the options available.
+  		<br><br>
+  		<p><h4>2.2.1 Evidence type</h4>
+  			Tick the checkbox of evidence(s) which you want to search within. Tick 'All' to select all evidences at once. 
+  		</p>
+  		<br>
+  		<p><h4>2.2.2 Threshold </h4>
+  			Enter a score between 0-1 in the threshold textbox. Only the drugs with a similarity higher than the threshold will be displayed in the result.
+  		</p>
+  	</p>
+  	<br>
+  <h2>3. Result Page</h2>
+  <br>
+  <p><h3>3.1 Network view</h3>
+  </p>
+  <br>
+  <p><h3>3.2 Table view</h3>
+  	The table consists of at least four columns: ID, Name, score_of_an_evidence(up to columns), Score. The last column score is an average of all existing score_of_an_evidnece. 
+  </p>
+  <br>
+  <p><h3>3.3 Export</h3>
+  	The table view can be exported as a csv file. Click on the 'Download' button and the file will be downloaded to the default location.
+  </p>
+  <br>
+
+  <h2>4. Others</h2>
+  	<br>
+  	<p><h3>4.1 Index Page</h3>
+  		Click on search leads to search page.<br>
+  		Click on upload leads to upload page.
+  	</p>
+  	
+  	<p><h3>4.2 Buttons on top</h3>
+  		Home button leads back to index page.<br>
+  		Back button leads back the previous page.<br>
+  		Help button leads to the help page.<br>
+  	</p>
+</div>
 {% endblock %}
