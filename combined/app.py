@@ -253,32 +253,19 @@ def result(query,evidence, threshold):
         titles.append('Drugs with evidence ' + (', ').join(evidences))
         print datadf
         
-        conn.close()
-        
+
         ##network result##
 
         nodes= []
-        edges1= []
-        edges2= []
-        fullnetwork= []
-        drugs= []
-        trueedges1= []
-        trueedges2= []
-        drugs.append(query)
-
+        querynode = query
         for row in datadf.itertuples(index = True, name = 'Pandas'):
-            drugs.append(getattr(row, 'Index'))
-        print(drugs)
+            nodes.extend([getattr(row,'Index')])
+        json_nodes = json.dumps(nodes)
 
-        for row in datadf.itertuples(index=True, name='Pandas'):
-            edges1.append(query)
-            edges2.append(getattr(row, 'Index'))
-        print edges1
-        print edges2
-    
+        conn.close()
+
         if len(data) >0:
-        # no url change now
-            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles, nodes=drugs, edges1=edges1, edges2=edges2)
+            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles, querynode=querynode, nodes=json_nodes)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
