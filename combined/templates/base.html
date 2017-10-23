@@ -1,6 +1,17 @@
-<html>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+﻿<html>
+<!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+<link href="//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+<script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="//code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     {% if title %}
     <title>{{ title }} - DrugSim</title>
     {% else %}
@@ -8,7 +19,14 @@
     {% endif %}
   </head>
   <body>
-    <div>DrugSim: <a href="/">Home</a></div>
+    <div><h4>DrugSim: <a class='btn btn-default' href="/">Home</a> <a class='btn btn-default' onclick="goBack()">Back</a> <a class='btn btn-default' href='#'>Help</a></h4></div>
+    
+    <script>
+    function goBack() {
+        window.history.back()
+    }
+    </script>
+
     <hr>
     {% with messages = get_flashed_messages() %}
     {% if messages %}

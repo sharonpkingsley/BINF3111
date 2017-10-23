@@ -1,112 +1,127 @@
-<!doctype html>
+<!-- extend base layout -->
+{% extends "base.html" %}
 
-<html>
-
-<head>
-    {% if title %}
-    <title>{{ title }} - DrugSim</title>
-    {% else %}
-    <title>DrugSim</title>
-    {% endif %}
-
-    <script src="{{url_for('script')}}"></script>
-</head>
+{% block content %}
 
 <style>
     #cy {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 10%;
-        left: 0%;
+        width: 55%;
+        height: 60%;
+        top: 15%;
+        left: 20%;
     }
     #table {
-        position: absolute;
-        left:10%;
-        top:100%;
+        top: 85%;
     }
+
 </style>
-
-<body>
-    <div>DrugSim: <a href="/">Home</a></div>
-    <hr>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{ message }} </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <h1>Result</h1>   
-    <div id="cy"></div>
-    <script>
-        window.alert('1')
-
-        var tab = document.getElementById('cy')
-        var cy = cytoscape({
-            container: document.getElementById('cy'),
-            
-            style: [
-                
-                {
-                    selector: 'edge',
-                    style: {
-                        'width': 0.5,
-                        'line-color': '#ad1a66'
-                    }
-                }
-
-            ],
-
-        elements: [
-            ]
-        });
-        
-        var nodes = '{{ nodes|tojson }}'
-        var edges1 = '{{ edges1|tojson }}'
-        var edges2 = '{{ edges2|tojson }}'
-        for (var i = 0; i < nodes.length; i++) {
-
-            cy.add([
-                { group: "nodes", data: { id: nodes[i] } }
-            ]);
-        }
-
-
-        for (var i = 0; i < edges1.length; i++) {
-            if (edges1[i] != edges2[i]) {
-                cy.add([
-                    {
-                        group: "edges",
-                        data: {
-                            id: edges1[i] + edges2[i],
-                            source: edges1[i],
-                            target: edges2[i]
-                        }
-                    }
-                ]);
+<script>
+$(document).ready(function(){
+  $("#query").hyperlink({
+            source:function(request, response) {
+                $.getJSON("{{url_for('hyperlink')}}",{
+                    q: request.term, // in flask, "q" will be the argument to look for using request.args
+                }, function(data) {
+                    response(data.matching_results); // matching_results from jsonify
+                });
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                console.log(ui.item.value); // not in your question, but might help later
             }
-        }
+        });
+  $('tbody tr th').each(function(){
+    $(this).html('<a href="#">' + $(this).html() + '</a>')
+  });
+});
+</script>
 
-        
-        var options = {
-        };
+<div id='result' class='container'>
+         
+    <h1>Result</h1>
+    
+    <div class="container">
+            <div id="cy">
+                <script src="{{url_for('script')}}"></script>
+                <script>
+                    window.alert('1')
+
+                    var tab = document.getElementById('cy')
+                    var cy = cytoscape({
+                        container: document.getElementById('cy'),
+                        
+                        style: [
+                            
+                            {
+                                selector: 'edge',
+                                style: {
+                                    'width': 0.5,
+                                    'line-color': '#ad1a66',
+                                    'curve-style': 'bezier'
+                                }
+                            }
+
+                        ],
+                        elements: [
+                        ]
+                    });
 
 
-        cy.layout(options);
-        var layout = cy.layout({ name: 'concentric' });
+                    var nodes = {{ nodes|safe }}
+                    window.alert(nodes)
+                    var querynode = '{{ querynode }}'
+                    cy.add([
+                        { group: "nodes", data: { id: querynode } }
+                    ]);
+                    for (var i = 0; i < nodes.length; i++) {
+                        
+                        cy.add([
+                            { group: "nodes", data: { id: nodes[i] } },
+                            {
+                                group: "edges",
+                                data: {
+                                    id: nodes[i] + querynode,
+                                    source: querynode,
+                                    target: nodes[i]
+                                }
+                            }
+                        ]);
+                    }
 
-        layout.run();
-    </script>
-    <div id ="table">
-    <p>
-        {% for table in tables %}
-        <h2>{{titles[loop.index]}}</h2>
-        {{ table|safe }}
-        {% endfor %}
-    </p>
+
+
+
+
+                    var options = {
+
+                    };
+
+
+                    cy.layout(options);
+                    var layout = cy.layout({ name: 'concentric' });
+
+                    layout.run();
+                </script>
+        </div>
     </div>
-</body>
-</html>
+    <div id="table">
+        <p>
+            {% for table in tables %}
+            <h3>{{titles[loop.index]}}</h3>
+            {{ table|safe }}
+            {% endfor %}
+        </p>
+
+        <form method="Post">
+            <button type="submit" name="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-download"></span> Download
+            </button>
+        </form>
+        <a href="/search" class="btn btn-default">
+            <span class="glyphicon glyphicon-search"></span> Search More...
+        </a>
+    </div>
+</div>
+
+
+{% endblock %}
