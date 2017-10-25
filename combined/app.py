@@ -142,8 +142,11 @@ def upload_file():
                     return render_template('error.html', error = e)
             elif request.form['button'] == 'new_drug':
                     print 'new_drug'
-                    drugid = request.form['drugid']
-                    drugname = request.form['drugname']
+                    
+                    drugid_name = request.form['drugid']
+                    id_name = drugid_name.split(' ')
+                    drugid = id_name[0]
+                    drugname = id_name[1]
                     file = request.files['filenew']
                     evidence_name = request.form['option-new']
                     
@@ -165,7 +168,7 @@ def upload_file():
                     cursor.callproc('newDrugAddition', args)
                     conn.commit()
                     conn.close()
-                    message='New drug addtion success'
+                    message='Evidence update/addition success'
             elif request.form['button'] == 'update_drug':
                 print 'edit'
                 druga = request.form['druga']

@@ -23,7 +23,7 @@
             <div id="cy">
                 <script src="{{url_for('script')}}"></script>
                 <script>
-                    window.alert('1');
+                    //window.alert('1');
                     var tab = document.getElementById('cy');
                     var cy = cytoscape({
                         container: document.getElementById('cy'),
@@ -63,7 +63,7 @@
                         ]
                     });
                     var nodes= {{ nodes|safe }};
-                    window.alert(nodes);
+                    //window.alert(nodes);
                     var querynode = '{{ querynode }}';
                     cy.add([
                         { group: "nodes", data: { id: querynode } }
@@ -86,9 +86,9 @@
                     var target = {{ target|safe }}
                     var struct = {{ struct|safe }}
                     var pathway = {{ pathway|safe }}
-                    window.alert(target);
-                    window.alert(struct);
-                    window.alert(pathway);
+                    //window.alert(target);
+                    //window.alert(struct);
+                    //window.alert(pathway);
                     for (var i = 0; i < target.length; i++) {
                         cy.add([
                             {

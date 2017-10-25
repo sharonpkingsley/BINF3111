@@ -382,10 +382,10 @@ begin
 
 end$$ 
 DELIMITER ;
-call searchMaxThreeSelectedEvidence('DB00014','','','Target',0.07);
+#call searchMaxThreeSelectedEvidence('DB00014','','','Target',0.07);
 
 
 
-select CONCAT("\tDrugBank: ", IFNULL(links.DrugBank, ''), "\n\tKEGG: ", IFNULL(links.KEGG, ''), "\n\tPubChem: ", IFNULL(links.PubChem, ''), "\n\tDrugs.com: ", IFNULL(links.`Drugs.com`,'')) as hyperlink from  links, info where links.`GENERIC NAME` = info.`GENERIC NAME` and ID="DB00123"
+#select CONCAT("\tDrugBank: ", IFNULL(links.DrugBank, ''), "\n\tKEGG: ", IFNULL(links.KEGG, ''), "\n\tPubChem: ", IFNULL(links.PubChem, ''), "\n\tDrugs.com: ", IFNULL(links.`Drugs.com`,'')) as hyperlink from  links, info where links.`GENERIC NAME` = info.`GENERIC NAME` and ID="DB00123"
 
 

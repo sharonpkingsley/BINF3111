@@ -185,5 +185,3 @@ begin
 end$$ 
 DELIMITER ;
 
-call changeDrugRecord('DB30000','DB00014','Struct',0.04);
-
