@@ -24,7 +24,7 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'binf3111'
 app.config['MYSQL_DATABASE_DB'] = 'drugdb'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-app.config['PATHWAY_TO_DBCODE_FOLDER'] = '/users/apple/desktop/desktop/binf3111/combined/db_codes/'
+app.config['PATHWAY_TO_DBCODE_FOLDER'] = './db_codes/'
 app.config['PATHWAY_TO_MYSQL'] = '/usr/local/mysql-5.7.19-macos10.12-x86_64/bin/mysql'
 mysql.init_app(app)
 
@@ -80,12 +80,12 @@ def upload_file():
             if request.form['button'] == 'file':  
                 file = request.files['file']
                 evidence_name = request.form['option']
-                            
+                
                 if file and allowed_file(file.filename):
                     filename = secure_filename(file.filename)
                     saveLocation = app.config['UPLOAD_FOLDER'] + filename
                     file.save(saveLocation)
-                    if evidence_name == 'info' or evidence_name == 'links':
+                    if evidence_name == 'info':
                         df1 = pd.read_csv(saveLocation)
                         df1.to_sql(evidence_name, con=engine, if_exists='replace')
 
@@ -278,15 +278,39 @@ def result(query,evidence, threshold):
         ##network result##
 
         nodes= []
+        
         querynode = query
         for row in datadf.itertuples(index = True, name = 'Pandas'):
             nodes.extend([getattr(row,'Index')])
         json_nodes = json.dumps(nodes)
+        target=[]
+        pathway=[]
+        struct=[]
+        for column in columns:
+            if column == 'target':
+                
+                for row in datadf.itertuples(index = True, name = 'Pandas'):
+                    if getattr(row,'target') >= threshold:
+                        target.extend([getattr(row,'Index')])
+            if column == 'pathway':
+                
+                for row in datadf.itertuples(index = True, name = 'Pandas'):
+                    if getattr(row,'pathway') >= threshold:
+                        pathway.extend([getattr(row,'Index')])
+            if column == 'chemical_structure':
+                
+                for row in datadf.itertuples(index = True, name = 'Pandas'):
+                    if getattr(row,'chemical_structure') >= threshold:
+                        struct.extend([getattr(row,'Index')])
 
+        targetjs = json.dumps(target)
+        pathwayjs = json.dumps(pathway)
+        structjs = json.dumps(struct)
         conn.close()
 
         if len(data) >0:
-            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles, querynode=querynode, nodes=json_nodes)
+            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles,  querynode=querynode, nodes=json_nodes, 
+                                   target=targetjs, pathway=pathwayjs, struct=structjs)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':

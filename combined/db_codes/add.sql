@@ -1,3 +1,7 @@
+#search on max three evidence and combined the result with average score at the end
+
+
+#search with selected multiple evidences with one drug name as parameters
 drop procedure if exists newDrugAddition;
 DELIMITER $$
 create procedure newDrugAddition(IN drugID VARCHAR(255), IN drugName VARCHAR(255), IN evi1 VARCHAR(255))
@@ -46,11 +50,13 @@ begin
             #select @tempTable;
             set @tempTableID = drugID; 
             select @tempTableID;
-            set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
-            select @insertFirstID;
-            PREPARE re FROM @insertFirstID;
-            EXECUTE re;
-            DEALLOCATE PREPARE re;
+            if not exists(select ID from info where ID = drugID) THEN 
+                set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
+                select @insertFirstID;
+                PREPARE re FROM @insertFirstID;
+                EXECUTE re;
+                DEALLOCATE PREPARE re;
+            end if;
         end loop;
     end;
     close cur1_1;
@@ -67,11 +73,13 @@ begin
             end if;
             SET @tempTable = table_name2_1; 
             set @tempTableID = drugID; 
-            set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
-            select @insertFirstID;
-            PREPARE re FROM @insertFirstID;
-            EXECUTE re;
-            DEALLOCATE PREPARE re;
+            if not exists(select ID from info where ID = drugID) THEN 
+                set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
+                select @insertFirstID;
+                PREPARE re FROM @insertFirstID;
+                EXECUTE re;
+                DEALLOCATE PREPARE re;
+            end if;
         end loop;
     end;
     close cur2_1;
@@ -89,11 +97,13 @@ begin
             SET @tempTable = table_name3_1; 
             #select @tempTable;
             set @tempTableID = drugID; 
-            set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
-            select @insertFirstID;
-            PREPARE re FROM @insertFirstID;
-            EXECUTE re;
-            DEALLOCATE PREPARE re;
+            if not exists(select ID from info where ID = drugID) THEN 
+                set @insertFirstID = concat('insert into ', @tempTable, '(DRUGBANK_ID) values (\'', drugID ,'\')');
+                select @insertFirstID;
+                PREPARE re FROM @insertFirstID;
+                EXECUTE re;
+                DEALLOCATE PREPARE re;
+            end if;
         end loop;
     end;
     close cur3_1;
@@ -118,11 +128,18 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;#
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
+
             set @updateTable = concat('update ', @tempTable1, ' f inner join ( select DRUGBANK_ID, ', drugID ,' from ', @tempTableID1, ' )a on f.DRUGBANK_ID = a.DRUGBANK_ID set f.',@tempTableID1,'= a.', drugID);
             PREPARE re FROM @updateTable;
             EXECUTE re;
@@ -178,11 +195,17 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;            
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -205,11 +228,17 @@ begin
             #add to the end of the last file of the evidence file
             #select @tempTable1;
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;#
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -236,11 +265,17 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateTable = concat('update ', @tempTable1, ' f inner join ( select DRUGBANK_ID, ', drugID ,' from ', @tempTableID1, ' )a on f.DRUGBANK_ID = a.DRUGBANK_ID set f.',@tempTableID1,'= a.', drugID);
             PREPARE re FROM @updateTable;
             EXECUTE re;
@@ -265,7 +300,7 @@ begin
                     leave myloop6;
                 end if;
             SET @tempTable2 = table_name2_3;
-            set @tempColumn2 = column_name2_3;#
+            set @tempColumn2 = column_name2_3;
             set @updateTableA = concat('update ', @tempTable2, ' a, (select ',drugID,' from ', @tempTable1,' where DRUGBANK_ID = \'', @tempColumn2,'\') b set a.', @tempColumn2 , ' = coalesce(b.',drugID,',0) where DRUGBANK_ID = \'', drugID, '\'');
             SELECT @updateTableA;
             PREPARE re FROM @updateTableA;
@@ -293,11 +328,18 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;#
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
+            
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -320,11 +362,17 @@ begin
             #add to the end of the last file of the evidence file
             #select @tempTable1;
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;#
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -350,11 +398,17 @@ begin
             #add to the end of the last file of the evidence file
             #select @tempTable1;
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;#
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateTable = concat('update ', @tempTable1, ' f inner join ( select DRUGBANK_ID, ', drugID ,' from ', @tempTableID1, ' )a on f.DRUGBANK_ID = a.DRUGBANK_ID set f.',@tempTableID1,'= a.', drugID);
             PREPARE re FROM @updateTable;
             EXECUTE re;
@@ -408,11 +462,17 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -436,11 +496,17 @@ begin
             #select @tempTable1;
             #add the new null column for the new drug with its ID as the column name
             set @tempTableID1 = drugID; #new uplaod file for the new drug
-            #select @tempTableID;#
-            set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
-            PREPARE res FROM @tt;
-            EXECUTE res;
-            DEALLOCATE PREPARE res;
+            IF NOT EXISTS( SELECT NULL
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                       WHERE table_name = @tempTable1
+                         AND table_schema = 'drugdb'
+                         AND column_name = @tempTableID1)  THEN
+
+                set @tt = concat('alter table ', @tempTable1, ' add column ', @tempTableID1,' VARCHAR(255)');
+                PREPARE res FROM @tt;
+                EXECUTE res;
+                DEALLOCATE PREPARE res;
+            END IF;
             set @updateToNull = concat('update ', @tempTable1, ' set ',drugID ,' = 0 where ',drugID,' is null');
             PREPARE re FROM @updateToNull;
             EXECUTE re;
@@ -456,3 +522,6 @@ begin
 
 end$$ 
 DELIMITER ;
+
+
+

@@ -34,10 +34,30 @@
                                 selector: 'edge',
                                 style: {
                                     'width': 0.5,
-                                    'line-color': '#ad1a66',
-                                    'curve-style': 'bezier'
+                                    'line-color': 'black',
+                                    'curve-style': 'bezier',
+                                    'control-point-step-size': '10'
+                                }
+                            },
+                            {
+                                selector: "edge[id *= 'target']",
+                                css: {
+                                    'line-color': 'yellow'
+                                }
+                            },
+                            {
+                                selector: "edge[id *= 'pathway']",
+                                css: {
+                                    'line-color': 'blue'
+                                }
+                            },
+                            {
+                                selector: "edge[id *= 'struct']",
+                                css: {
+                                    'line-color': 'green'
                                 }
                             }
+
                         ],
                         elements: [
                         ]
@@ -61,7 +81,55 @@
                                 }
                             }
                         ]);
+
                     }
+                    var target = {{ target|safe }}
+                    var struct = {{ struct|safe }}
+                    var pathway = {{ pathway|safe }}
+                    window.alert(target);
+                    window.alert(struct);
+                    window.alert(pathway);
+                    for (var i = 0; i < target.length; i++) {
+                        cy.add([
+                            {
+                                group: "edges",
+                                data: {
+                                    id: target[i] + querynode + 'target',
+                                    source: querynode,
+                                    target: target[i]
+                                }
+                            }
+                        ]);
+
+                    }
+                    for (var i = 0; i < pathway.length; i++) {
+                        cy.add([
+                           {
+                                group: "edges",
+                                data: {
+                                    id: pathway[i] + querynode + 'pathway',
+                                    source: querynode,
+                                    target: pathway[i]
+                                }
+                            }
+                        ]);
+
+                    }
+                    for (var i = 0; i < struct.length; i++) {
+                        cy.add([
+                            {
+                                group: "edges",
+                                data: {
+                                    id: struct[i] + querynode + 'struct',
+                                    source: querynode,
+                                    target: struct[i]
+                                }
+                            }
+                        ]);
+
+                    }
+
+
                     var options = {
                     };
                     cy.layout(options);
