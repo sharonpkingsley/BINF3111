@@ -24,6 +24,8 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'binf3111'
 app.config['MYSQL_DATABASE_DB'] = 'drugdb'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+app.config['PATHWAY_TO_DBCODE_FOLDER'] = '/users/apple/desktop/desktop/binf3111/combined/db_codes/'
+app.config['PATHWAY_TO_MYSQL'] = '/usr/local/mysql-5.7.19-macos10.12-x86_64/bin/mysql'
 mysql.init_app(app)
 
 # upload configs
@@ -45,16 +47,36 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+#load procedures
+def load_sql_file(filename):
+    f = open(app.config['PATHWAY_TO_DBCODE_FOLDER']+filename, 'r')
+    proc = subprocess.Popen([app.config['PATHWAY_TO_MYSQL'], "--user=%s" % app.config['MYSQL_DATABASE_USER'], "--password=%s" % app.config['MYSQL_DATABASE_PASSWORD'], app.config['MYSQL_DATABASE_DB']],
+                        stdin=f)
+    out, err = proc.communicate()
+
+#init function
+def init():
+    # create database
+    engine = create_engine('mysql://' + app.config['MYSQL_DATABASE_USER'] + ':' + app.config['MYSQL_DATABASE_PASSWORD'] + '@' + app.config['MYSQL_DATABASE_HOST'], echo=True)
+    engine.execute("CREATE DATABASE IF NOT EXISTS " + app.config['MYSQL_DATABASE_DB'])
+    # load sql files
+    load_sql_file('dropTables.sql')
+    load_sql_file('add.sql')
+    load_sql_file('edit.sql')
+    load_sql_file('search.sql')
+    # executable shell
+    os.system('chmod +x cutFile.sh')
+                            
+
 # upload page
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     type_list = [ evi_list[0], evi_list[1], evi_list[2], 'info']
     if request.method == 'POST':
         try:
-            engine1 = create_engine('mysql://' + app.config['MYSQL_DATABASE_USER'] + ':' + app.config['MYSQL_DATABASE_PASSWORD'] + '@' + app.config['MYSQL_DATABASE_HOST'], echo=True)
-            engine1.execute("CREATE DATABASE IF NOT EXISTS " + app.config['MYSQL_DATABASE_DB'])
+            # init databases
             engine = create_engine('mysql://' + app.config['MYSQL_DATABASE_USER'] + ':' + app.config['MYSQL_DATABASE_PASSWORD'] + '@' + app.config['MYSQL_DATABASE_HOST'] + '/' + app.config['MYSQL_DATABASE_DB'], echo=True)
-                
+            
             if request.form['button'] == 'file':  
                 file = request.files['file']
                 evidence_name = request.form['option']
@@ -110,7 +132,6 @@ def upload_file():
                             columnRange = "1,"+colRangeAll[j]
                             file_name = str(UPLOAD_FOLDER) + "/" + str(evidence_name) + str(j) +".csv"
                             output_file = file_name.replace(" ", "")
-                            os.system('chmod +x cutFile.sh')
                             subprocess.call(['./cutFile.sh', columnRange, str(saveLocation), output_file])
                             dff = pd.read_csv(output_file)
                             evidenceTable = str(evidence_name) + str(j)
@@ -338,4 +359,5 @@ def help():
 
 
 if __name__ == '__main__':
+    init()
     app.run(debug=True)
