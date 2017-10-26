@@ -21,22 +21,33 @@
     
     <div class="container">
             <div id="cy">
-                <script src="{{url_for('script')}}"></script>
+                
                 <script>
-                    //window.alert('1');
+                   
+                    var querynode = '{{ querynode }}';
+                    
                     var tab = document.getElementById('cy');
                     var cy = cytoscape({
                         container: document.getElementById('cy'),
-                        
+                        layout: 'concentric',
                         style: [
-                            
+                            {
+                                selector: 'node',
+                                style: {
+                                    
+                                    label: 'data(id)'
+
+
+                                }
+                            },
                             {
                                 selector: 'edge',
                                 style: {
-                                    'width': 0.5,
+                                    'width': 1.5,
                                     'line-color': 'black',
                                     'curve-style': 'bezier',
-                                    'control-point-step-size': '10'
+                                    'control-point-step-size': '10',
+                                    
                                 }
                             },
                             {
@@ -62,41 +73,45 @@
                         elements: [
                         ]
                     });
-                    var nodes= {{ nodes|safe }};
-                    //window.alert(nodes);
-                    var querynode = '{{ querynode }}';
+                    var nodes = {{ nodes|safe }};
+                    var score = {{ score|safe }}
+                   
+                    
                     cy.add([
-                        { group: "nodes", data: { id: querynode } }
+                        { data: { id: querynode } }
                     ]);
                     for (var i = 0; i < nodes.length; i++) {
                         
-                        cy.add([
-                            { group: "nodes", data: { id: nodes[i] } },
-                            {
-                                group: "edges",
-                                data: {
-                                    id: nodes[i] + querynode,
-                                    source: querynode,
-                                    target: nodes[i]
-                                }
+                        cy.add({
+                                data: { id: nodes[i] }
                             }
-                        ]);
+                        );
+                        
+                        cy.add({
+                                data: {
+                                id: 'edge' + i,
+                                source: nodes[i],
+                                target: querynode,
+                                weight: score[i]
+                            }
+
+                        });
 
                     }
                     var target = {{ target|safe }}
                     var struct = {{ struct|safe }}
                     var pathway = {{ pathway|safe }}
-                    //window.alert(target);
-                    //window.alert(struct);
-                    //window.alert(pathway);
+                    var targetsc = {{ targetsc|safe }}
+                    var structsc = {{ structsc|safe }}
+                    var pathwaysc = {{ pathwaysc|safe }}
                     for (var i = 0; i < target.length; i++) {
                         cy.add([
                             {
-                                group: "edges",
                                 data: {
                                     id: target[i] + querynode + 'target',
                                     source: querynode,
-                                    target: target[i]
+                                    target: target[i],
+                                    weight: targetsc[i]
                                 }
                             }
                         ]);
@@ -105,11 +120,11 @@
                     for (var i = 0; i < pathway.length; i++) {
                         cy.add([
                            {
-                                group: "edges",
                                 data: {
                                     id: pathway[i] + querynode + 'pathway',
                                     source: querynode,
-                                    target: pathway[i]
+                                    target: pathway[i],
+                                    weight: pathwaysc[i]
                                 }
                             }
                         ]);
@@ -118,11 +133,11 @@
                     for (var i = 0; i < struct.length; i++) {
                         cy.add([
                             {
-                                group: "edges",
-                                data: {
+                                    data: {
                                     id: struct[i] + querynode + 'struct',
                                     source: querynode,
-                                    target: struct[i]
+                                    target: struct[i],
+                                    weight: structsc[i]
                                 }
                             }
                         ]);
@@ -130,14 +145,70 @@
                     }
 
 
-                    var options = {
-                    };
-                    cy.layout(options);
-                    var layout = cy.layout({ name: 'concentric' });
-                    layout.run();
+                    cy.layout({
+                        name: 'cose',
+                        idealEdgeLength: function (edge) {
+                            // Default is: 10
+                            // Instead, base it on "weight"
+                            return edge.data().weight * 100
+                        },
+                        nodeOverlap: 20,
+                        refresh: 20,
+                        fit: true,
+                        padding: 30,
+                        randomize: false,
+                        componentSpacing: 100,
+                        nodeRepulsion: 400000,
+                        edgeElasticity: 100,
+                        nestingFactor: 5,
+                        gravity: 80,
+                        numIter: 1000,
+                        initialTemp: 200,
+                        coolingFactor: 0.95,
+                        minTemp: 1.0
+                    }).run();
+
+                    
+                    
                 </script>
         </div>
     </div>
+    {% if img == "tpc" %}
+    <p>
+        <img src="{{url_for('static', filename='STPC.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "tp" %}
+    <p>
+        <img src="{{url_for('static', filename='STP.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "tc" %}
+    <p>
+        <img src="{{url_for('static', filename='STC.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "t" %}
+    <p>
+        <img src="{{url_for('static', filename='ST.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "pc" %}
+    <p>
+        <img src="{{url_for('static', filename='SPC.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "p" %}
+    <p>
+        <img src="{{url_for('static', filename='SP.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+    {% if img == "c" %}
+    <p>
+        <img src="{{url_for('static', filename='SC.jpg')}}" style="height:50px;" />
+    </p>
+    {% endif %}
+   
     <div id="table">
         <p>
             {% for table in tables %}

@@ -274,46 +274,64 @@ def result(query,evidence, threshold):
         datadf = pd.DataFrame(list(data), columns = columns)
         datadf.set_index(['ID'], inplace= True)
         datadf.index.name = None
-        titles.append('Drugs with evidence ' + (', ').join(evidences))
+        titles.append('Drug similarity score for evidence ' + (', ').join(evidences))
         print datadf
         
 
         ##network result##
 
-        nodes= []
         
+        nodes= []
+        score=[]
         querynode = query
         for row in datadf.itertuples(index = True, name = 'Pandas'):
             nodes.extend([getattr(row,'Index')])
+            score.extend([getattr(row,'Score')])
         json_nodes = json.dumps(nodes)
+        scorejs = json.dumps(score)
+
         target=[]
         pathway=[]
         struct=[]
+        targetsc=[]
+        pathwaysc=[]
+        structsc=[]
+        img=""
+        
         for column in columns:
             if column == 'target':
-                
+                img += 't'
                 for row in datadf.itertuples(index = True, name = 'Pandas'):
                     if getattr(row,'target') >= threshold:
                         target.extend([getattr(row,'Index')])
+                        targetsc.extend([getattr(row,'target')])
             if column == 'pathway':
-                
+                img += 'p'
                 for row in datadf.itertuples(index = True, name = 'Pandas'):
                     if getattr(row,'pathway') >= threshold:
                         pathway.extend([getattr(row,'Index')])
+                        pathwaysc.extend([getattr(row,'pathway')])
             if column == 'chemical_structure':
-                
+                img += 'c'
                 for row in datadf.itertuples(index = True, name = 'Pandas'):
                     if getattr(row,'chemical_structure') >= threshold:
                         struct.extend([getattr(row,'Index')])
+                        structsc.extend([getattr(row,'chemical_structure')])
 
         targetjs = json.dumps(target)
         pathwayjs = json.dumps(pathway)
         structjs = json.dumps(struct)
+        targetscjs = json.dumps(targetsc)
+        pathwayscjs = json.dumps(pathwaysc)
+        structscjs = json.dumps(structsc)
         conn.close()
+        print (img)
 
         if len(data) >0:
-            return render_template('result.html',tables=[datadf.to_html(classes='table')], titles = titles,  querynode=querynode, nodes=json_nodes, 
-                                   target=targetjs, pathway=pathwayjs, struct=structjs)
+            return render_template('result.html',tables=[datadf.to_html(classes='table')], 
+                                   titles = titles, querynode=querynode, nodes=json_nodes, 
+                                   target=targetjs, pathway=pathwayjs, struct=structjs, score=scorejs,
+                                   targetsc=targetscjs, pathwaysc=pathwayscjs, structsc=structscjs, img = img)
         else:
             return render_template('error.html', error = 'No result!')
     elif request.method == 'POST':
